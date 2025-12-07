@@ -818,6 +818,7 @@ def enregistrer_reponse(option_texte):
     }
     
     next_question()
+    st.rerun()  # Force le rechargement immédiat
 
 
 @st.cache_data(ttl=3600)  # Cache pendant 1 heure
