@@ -1433,23 +1433,22 @@ else:
                 unsafe_allow_html=True,
             )
 
-            # Générer le HTML du carrousel avec les vraies données
-            cards_html = ""
-            for annonce in annonces:
-                details = f"{annonce['pieces']}" if annonce['pieces'] != 'N/A' else ""
-                if annonce['surface'] != 'N/A':
-                    details += f" • {annonce['surface']}"
-                
-                cards_html += f"""<div class="listing-card">
+                # Générer le HTML du carrousel avec les vraies données
+                cards_html = ""
+                for annonce in annonces:
+                    details = f"{annonce['pieces']}" if annonce['pieces'] != 'N/A' else ""
+                    if annonce['surface'] != 'N/A':
+                        details += f" • {annonce['surface']}"
+                    
+                    cards_html += f"""<div class="listing-card">
     <div class="listing-image" style="background-image: url('{annonce['image']}');"></div>
     <div class="listing-title">{annonce['type']}</div>
     <div class="listing-location">{annonce['localisation']} {details}</div>
     <div class="listing-price" style="color: #ff5a5f;">{annonce['prix']}</div>
     <a href="{annonce['lien']}" target="_blank" class="listing-link">Voir l'offre</a>
 </div>"""
-                    
+                
                 listings_html = f'<div class="carousel-container">{cards_html}</div>'
-
                 st.markdown(listings_html, unsafe_allow_html=True)
                 st.markdown("\n---\n")
     
