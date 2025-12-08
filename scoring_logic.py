@@ -22,12 +22,12 @@ FICHIER_MATRICE = 'DATASET scores brut.xlsx'
 
 class CriterePonderation:
     """Définit l'importance relative des différents critères"""
-    PRIX = 1.0
-    TRANSPORTS = 2.0
+    PRIX = 1.8  # Augmenté car critère décisif
+    TRANSPORTS = 2.5  # Essentiel mobilité quotidienne
     ESPACES_VERTS = 1.5
-    SECURITE = 2.0
-    COMMERCES = 1.5
-    CULTURE = 1.5
+    SECURITE = 2.8  # Prioritaire : qualité de vie
+    COMMERCES = 2.2  # Augmenté : commodités quotidiennes
+    CULTURE = 1.3  # Bars : moins prioritaire
     SPORT = 1.0
 
 
@@ -128,14 +128,20 @@ def _calculer_score_espaces_verts(iris_data: pd.DataFrame, profil: ProfilUtilisa
 
 
 def _calculer_score_transports(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
-    """Score transports basé sur Nb_Transports"""
+    """Score transports basé sur Nb_Transports avec bonus forte desserte"""
     nb_transports = iris_data['Nb_Transports']
     score = _normaliser_score(nb_transports)
-    return (score * profil.mobilite_multiplier).clip(upper=100)
+    
+    # Bonus pour très bonne desserte (5+ arrêts)
+    bonus_proximite = pd.Series(0.0, index=score.index)
+    tres_bien_desservi = nb_transports >= 5
+    bonus_proximite[tres_bien_desservi] = ((nb_transports[tres_bien_desservi] - 4) * 4).clip(upper=15)
+    
+    return ((score + bonus_proximite) * profil.mobilite_multiplier).clip(upper=100)
 
 
 def _calculer_score_tranquillite(iris_data: pd.DataFrame, iris_data_raw: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
-    """Score tranquillité basé sur NORM_BRUIT"""
+    """Score tranquillité basé sur NORM_BRUIT avec adaptation selon préférence calme/animé"""
     # Moins de bruit = plus tranquille
     if 'Norm_Bruit' in iris_data_raw.columns:
         score_base = 100 - (iris_data_raw['Norm_Bruit'] * 100)
@@ -143,38 +149,56 @@ def _calculer_score_tranquillite(iris_data: pd.DataFrame, iris_data_raw: pd.Data
         # Fallback si colonne manquante
         score_base = pd.Series(50.0, index=iris_data.index)
     
-    # Bonus quartiers très calmes
+    # Bonus/malus selon préférence calme vs animé
+    if profil.calme_vs_anime < -0.5:  # Préfère le calme
+        zones_calmes = score_base > 65
+        score_base[zones_calmes] += 18
+    elif profil.calme_vs_anime > 1.0:  # Tolère le bruit (aime l'animation)
+        score_base = score_base * 0.65 + 35
+    
+    # Bonus quartiers très calmes pour forte importance
     bonus_calme = pd.Series(0.0, index=score_base.index)
     if profil.tranquillite_importance >= 2.0 and 'Bruit_Leq_dB' in iris_data_raw.columns:
         bruit_db = iris_data_raw['Bruit_Leq_dB']
-        quartiers_calmes = bruit_db < 60
-        bonus_valeur = (60 - bruit_db[quartiers_calmes]) / 60 * 30
+        quartiers_calmes = bruit_db < 58
+        bonus_valeur = (58 - bruit_db[quartiers_calmes]) / 58 * 25
         bonus_calme[quartiers_calmes] = bonus_valeur
     
-    return ((score_base + bonus_calme) * profil.tranquillite_importance).clip(upper=100)
+    return ((score_base + bonus_calme) * profil.tranquillite_importance / 2.0).clip(upper=100)
 
 
 def _calculer_score_commerces(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
-    """Score commerces/commodités"""
+    """Score commerces/commodités avec pondération adaptive"""
+    # Pondération basée sur le besoin de proximité
+    base_weight = 1.0 + (profil.communaute * 0.4)
+    
     score = (
-        iris_data['Nb_Commerces'] * 3 +
-        iris_data['Nb_Pharmacies'] * 5 +
-        iris_data['Nb_Restaurants'] * 2
+        iris_data['Nb_Commerces'] * 3 * base_weight +
+        iris_data['Nb_Pharmacies'] * 5 * base_weight +
+        iris_data['Nb_Restaurants'] * 2.5
     )
     normalized = _normaliser_score(score)
     
     score_final = normalized
     if profil.vie_nocturne > 1.0:
-        score_final *= 1.2
+        score_final *= (1.0 + profil.vie_nocturne * 0.12)
     
     return score_final.clip(upper=100)
 
 
 def _calculer_score_culture(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
-    """Score culture basé sur Nb_Bars"""
+    """Score bars basé sur Nb_Bars avec pondération selon vie nocturne"""
     score = iris_data['Nb_Bars']
     normalized = _normaliser_score(score)
-    return normalized.clip(upper=100)
+    
+    # Multiplicateur selon importance vie nocturne et ambiance souhaitée
+    multiplicateur = 1.0
+    if profil.vie_nocturne >= 1.5:
+        multiplicateur = 1.0 + (profil.vie_nocturne * 0.3)
+    if profil.calme_vs_anime > 0.5:  # Ambiance animée
+        multiplicateur *= 1.2
+    
+    return (normalized * multiplicateur).clip(upper=100)
 
 
 def _calculer_score_sport(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
@@ -206,20 +230,24 @@ def _calculer_bonus_equilibre(iris_data: pd.DataFrame, iris_data_raw: pd.DataFra
     
     nb_criteres_ok = pd.Series(0, index=iris_data.index)
     
+    # Critères d'équilibre avec seuils optimisés
     if 'Prix_Median_m2' in iris_data.columns:
-        nb_criteres_ok += (iris_data['Prix_Median_m2'] < 2800).astype(int)
+        nb_criteres_ok += ((iris_data['Prix_Median_m2'] > 2000) & (iris_data['Prix_Median_m2'] < 3200)).astype(int)
     if 'Surface_Verte_m2' in iris_data.columns:
-        nb_criteres_ok += (iris_data['Surface_Verte_m2'] > 5000).astype(int)
+        nb_criteres_ok += (iris_data['Surface_Verte_m2'] > 3000).astype(int)
     if 'Nb_Transports' in iris_data.columns:
-        nb_criteres_ok += (iris_data['Nb_Transports'] > 2).astype(int)
+        nb_criteres_ok += (iris_data['Nb_Transports'] >= 3).astype(int)
     if 'Nb_Commerces' in iris_data.columns:
-        nb_criteres_ok += (iris_data['Nb_Commerces'] > 5).astype(int)
+        nb_criteres_ok += (iris_data['Nb_Commerces'] >= 4).astype(int)
+    if 'Nb_Ecoles' in iris_data.columns:
+        nb_criteres_ok += (iris_data['Nb_Ecoles'] >= 2).astype(int)
     if 'Bruit_Leq_dB' in iris_data_raw.columns:
-        nb_criteres_ok += (iris_data_raw['Bruit_Leq_dB'] < 70).astype(int)
+        nb_criteres_ok += (iris_data_raw['Bruit_Leq_dB'] < 68).astype(int)
     
-    bonus[nb_criteres_ok == 2] = 10
-    bonus[nb_criteres_ok == 3] = 20
-    bonus[nb_criteres_ok >= 4] = 35
+    # Bonus progressif
+    bonus[nb_criteres_ok == 3] = 8
+    bonus[nb_criteres_ok == 4] = 18
+    bonus[nb_criteres_ok >= 5] = 30
     
     return bonus
 
