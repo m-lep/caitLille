@@ -128,11 +128,15 @@ def _calculer_score_transports(iris_data: pd.DataFrame, profil: ProfilUtilisateu
 def _calculer_score_tranquillite(iris_data: pd.DataFrame, iris_data_raw: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
     """Score tranquillité basé sur NORM_BRUIT"""
     # Moins de bruit = plus tranquille
-    score_base = 100 - (iris_data_raw['Norm_Bruit'] * 100)
+    if 'Norm_Bruit' in iris_data_raw.columns:
+        score_base = 100 - (iris_data_raw['Norm_Bruit'] * 100)
+    else:
+        # Fallback si colonne manquante
+        score_base = pd.Series(50.0, index=iris_data.index)
     
     # Bonus quartiers très calmes
     bonus_calme = pd.Series(0.0, index=score_base.index)
-    if profil.tranquillite_importance >= 2.0:
+    if profil.tranquillite_importance >= 2.0 and 'Bruit_Leq_dB' in iris_data_raw.columns:
         bruit_db = iris_data_raw['Bruit_Leq_dB']
         quartiers_calmes = bruit_db < 60
         bonus_valeur = (60 - bruit_db[quartiers_calmes]) / 60 * 30
@@ -192,11 +196,17 @@ def _calculer_bonus_equilibre(iris_data: pd.DataFrame, iris_data_raw: pd.DataFra
     bonus = pd.Series(0.0, index=iris_data.index)
     
     nb_criteres_ok = pd.Series(0, index=iris_data.index)
-    nb_criteres_ok += (iris_data['Prix_Median_m2'] < 2800).astype(int)
-    nb_criteres_ok += (iris_data['Surface_Verte_m2'] > 5000).astype(int)
-    nb_criteres_ok += (iris_data['Nb_Transports'] > 2).astype(int)
-    nb_criteres_ok += (iris_data['Nb_Commerces'] > 5).astype(int)
-    nb_criteres_ok += (iris_data_raw['Bruit_Leq_dB'] < 70).astype(int)
+    
+    if 'Prix_Median_m2' in iris_data.columns:
+        nb_criteres_ok += (iris_data['Prix_Median_m2'] < 2800).astype(int)
+    if 'Surface_Verte_m2' in iris_data.columns:
+        nb_criteres_ok += (iris_data['Surface_Verte_m2'] > 5000).astype(int)
+    if 'Nb_Transports' in iris_data.columns:
+        nb_criteres_ok += (iris_data['Nb_Transports'] > 2).astype(int)
+    if 'Nb_Commerces' in iris_data.columns:
+        nb_criteres_ok += (iris_data['Nb_Commerces'] > 5).astype(int)
+    if 'Bruit_Leq_dB' in iris_data_raw.columns:
+        nb_criteres_ok += (iris_data_raw['Bruit_Leq_dB'] < 70).astype(int)
     
     bonus[nb_criteres_ok == 2] = 10
     bonus[nb_criteres_ok == 3] = 20
@@ -230,7 +240,15 @@ def calculer_scores_complets(profil: ProfilUtilisateur, iris_data: pd.DataFrame,
     """Calcule les scores complets pour tous les IRIS"""
     
     resultats = pd.DataFrame()
-    resultats['code_iris'] = iris_data['CODE_IRIS'].astype(str)
+    
+    # Gérer CODE_IRIS ou code_iris
+    if 'CODE_IRIS' in iris_data.columns:
+        resultats['code_iris'] = iris_data['CODE_IRIS'].astype(str)
+    elif 'code_iris' in iris_data.columns:
+        resultats['code_iris'] = iris_data['code_iris'].astype(str)
+    else:
+        # Fallback: créer des codes factices
+        resultats['code_iris'] = [f'IRIS_{i}' for i in range(len(iris_data))]
     
     # Calculer chaque critère
     resultats['score_prix'] = _calculer_score_prix(iris_data, profil)
