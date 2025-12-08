@@ -11,7 +11,7 @@ import os
 
 # Import du système de scoring
 try:
-    from scoring_logic import charger_matrice, recommander_quartiers
+    from scoring_logic import charger_matrice, consolider_poids_utilisateur, recommander_quartiers
     SCORING_DISPONIBLE = True
 except Exception as e:
     print(f"⚠️ Système de scoring non disponible: {e}")
@@ -25,18 +25,18 @@ st.set_page_config(
 )
 
 # -----------------------
-# Données (template) - 9 QUESTIONS
+# Données (template)
 # -----------------------
 
 PLACES = [
     {
-        "name": "Q1 : Budget logement",
-        "emoji": "💰",
-        "vibe": "Quel est ton budget ?",
-        "tags": ["prix", "budget", "loyer"],
-        "description": "Quel budget peux-tu consacrer à ton logement ?",
+        "name": "Q1 : Ambiance de quartier",
+        "emoji": "🏘️",
+        "vibe": "Quel type d'ambiance ?",
+        "tags": ["ambiance", "environnement", "style de vie"],
+        "description": "Quelle ambiance de quartier te correspond le mieux ?",
         "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Très limité", "Modéré", "Confortable", "Élevé"]
+        "options": ["Paisible & proche de la nature", "Calme mais avec un peu de vie", "Urbain & dynamique", "Très animé (bars, sorties, nightlife)"]
     },
     {
         "name": "Q2 : Mode de déplacement",
@@ -45,70 +45,79 @@ PLACES = [
         "tags": ["transport", "mobilité", "déplacement"],
         "description": "Quel est ton principal mode de déplacement au quotidien ?",
         "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Voiture", "Transports publics", "Vélo", "À pied"]
+        "options": ["Transports en commun", "Vélo / V'Lille", "Voiture", "À pied"]
     },
     {
-        "name": "Q3 : Importance des espaces verts",
+        "name": "Q3 : Sensibilité au bruit",
+        "emoji": "🔇",
+        "vibe": "Le bruit te dérange ?",
+        "tags": ["bruit", "calme", "nuisances"],
+        "description": "Quelle est ta sensibilité au bruit environnant ?",
+        "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Très sensible", "Un peu sensible", "Ça m'est égal", "J'aime quand ça bouge"]
+    },
+    {
+        "name": "Q4 : Importance des espaces verts",
         "emoji": "🌳",
         "vibe": "Nature à proximité ?",
         "tags": ["parcs", "nature", "espaces verts"],
         "description": "Quelle importance accordes-tu aux espaces verts et parcs ?",
         "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Indifférent", "Secondaire", "Important", "Essentiel"]
+        "options": ["Pas important", "Un peu important", "Très important", "Essentiel dans mon quotidien"]
     },
     {
-        "name": "Q4 : Sensibilité au bruit",
-        "emoji": "🔇",
-        "vibe": "Le bruit te dérange ?",
-        "tags": ["bruit", "calme", "nuisances"],
-        "description": "Quelle est ton besoin de tranquillité (faible niveau de bruit) ?",
+        "name": "Q5 : Budget logement",
+        "emoji": "💰",
+        "vibe": "Quel est ton budget ?",
+        "tags": ["prix", "budget", "loyer"],
+        "description": "Quel budget peux-tu consacrer à ton logement ?",
         "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Peu important", "Normal", "Important", "Primordial"]
+        "options": ["Serré", "Modéré", "Confortable", "Flexible"]
     },
     {
-        "name": "Q5 : Proximité des commerces",
+        "name": "Q6 : Habitudes alimentaires",
+        "emoji": "🍽️",
+        "vibe": "Comment manges-tu ?",
+        "tags": ["cuisine", "restaurants", "alimentation"],
+        "description": "Quelles sont tes habitudes pour les repas ?",
+        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Je cuisine souvent", "Je cuisine de temps en temps", "Je cuisine rarement", "Je mange beaucoup dehors"]
+    },
+    {
+        "name": "Q7 : Services de proximité",
         "emoji": "🏪",
-        "vibe": "Commerces proches ?",
+        "vibe": "Services essentiels ?",
         "tags": ["commerces", "services", "proximité"],
-        "description": "Quelle proximité souhaites-tu avec les commerces ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Indifférent", "Pas loin (15-20 min)", "Proche (10 min)", "Très proche (5 min)"]
-    },
-    {
-        "name": "Q6 : Vie nocturne et sorties",
-        "emoji": "🍻",
-        "vibe": "Sorties et bars ?",
-        "tags": ["bars", "sorties", "nightlife"],
-        "description": "Quelle importance accordes-tu à la vie nocturne ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Jamais", "Rarement", "Occasionnellement", "Très important"]
-    },
-    {
-        "name": "Q7 : Situation familiale",
-        "emoji": "👶",
-        "vibe": "Famille ?",
-        "tags": ["famille", "enfants", "écoles"],
-        "description": "Quelle est ta situation familiale ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Célibataire", "Couple sans enfant", "Jeune famille", "Famille nombreuse"]
-    },
-    {
-        "name": "Q8 : Pratique sportive",
-        "emoji": "🏃",
-        "vibe": "Sport régulier ?",
-        "tags": ["sport", "équipements", "activité"],
-        "description": "Pratiques-tu du sport régulièrement (besoin d'équipements) ?",
+        "description": "Quels services sont importants pour toi à proximité ?",
         "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Jamais", "Rarement", "Occasionnellement", "Très actif"]
+        "options": ["Pharmacie", "Commerces / supermarchés", "Restaurants / cafés", "Pas particulièrement"]
     },
     {
-        "name": "Q9 : Ambiance de quartier",
-        "emoji": "🏘️",
-        "vibe": "Quel type d'ambiance ?",
-        "tags": ["ambiance", "environnement", "style de vie"],
-        "description": "Quelle ambiance de quartier préfères-tu ?",
+        "name": "Q8 : Enfants",
+        "emoji": "👶",
+        "vibe": "As-tu des enfants ?",
+        "tags": ["famille", "enfants", "écoles"],
+        "description": "As-tu des enfants ou prévois-tu d'en avoir ?",
         "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Très calme", "Calme mais vivant", "Animé", "Très animé"]
+        "options": ["Oui", "Pas encore mais bientôt", "Non", "Jamais"]
+    },
+    {
+        "name": "Q9 : Sécurité et tranquillité",
+        "emoji": "🔒",
+        "vibe": "Sécurité importante ?",
+        "tags": ["sécurité", "tranquillité", "calme"],
+        "description": "Quelle importance pour la sécurité et la tranquillité ?",
+        "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Très important", "Assez important", "Peu important", "Pas vraiment"]
+    },
+    {
+        "name": "Q10 : Rythme de vie",
+        "emoji": "⚡",
+        "vibe": "Quel est ton rythme ?",
+        "tags": ["rythme", "lifestyle", "activité"],
+        "description": "Quel est ton rythme de vie au quotidien ?",
+        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Plutôt tranquille", "Relax & chill", "Dynamique", "Très actif / je sors souvent"]
     },
 ]
 
@@ -768,6 +777,9 @@ if "top_quartiers" not in st.session_state:
 if "tous_scores" not in st.session_state:
     st.session_state.tous_scores = None
 
+if "selected_quartier" not in st.session_state:
+    st.session_state.selected_quartier = None
+
 
 def next_question():
     """Passe à la question suivante."""
@@ -776,17 +788,18 @@ def next_question():
     # Si on a fini toutes les questions, calculer les recommandations
     if st.session_state.current_index == TOTAL and SCORING_DISPONIBLE:
         if st.session_state.matrice_data is not None:
+            poids = consolider_poids_utilisateur(st.session_state.reponses)
             # Calculer le top 3
             st.session_state.top_quartiers = recommander_quartiers(
-                st.session_state.reponses, 
+                poids, 
                 st.session_state.matrice_data, 
-                top_n=3
+                n_recommandations=3
             )
             # Calculer TOUS les scores pour la carte
             st.session_state.tous_scores = recommander_quartiers(
-                st.session_state.reponses, 
+                poids, 
                 st.session_state.matrice_data, 
-                top_n=110  # Tous les quartiers
+                n_recommandations=999  # Tous les quartiers
             )
 
 
@@ -1075,42 +1088,14 @@ else:
     # Créer des dictionnaires de scores par CODE_IRIS et NOM_IRIS
     scores_par_code = {}
     scores_par_nom = {}
-    details_par_code = {}  # Nouveau: stocke tous les détails des scores
-    details_par_nom = {}
     
     if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty:
         # Utiliser TOUS les scores calculés
         for _, row in st.session_state.tous_scores.iterrows():
-            nom = row['NOM_IRIS']
-            score_max = row['Score_Max']
-            
-            scores_par_nom[nom] = score_max
-            
-            # Stocker les détails complets
-            details = {
-                'score_total': score_max,
-                'score_prix': row.get('score_prix', 0),
-                'score_espaces_verts': row.get('score_espaces_verts', 0),
-                'score_transports': row.get('score_transports', 0),
-                'score_tranquillite': row.get('score_tranquillite', 0),
-                'score_commerces': row.get('score_commerces', 0),
-                'score_culture': row.get('score_culture', 0),
-                'score_sport': row.get('score_sport', 0),
-                'rang': row.get('rang', 0),
-                'code_iris': row.get('code_iris', 'N/A')
-            }
-            details_par_nom[nom] = details
-            
+            scores_par_nom[row['NOM_IRIS']] = row['Score_Max']
             # Aussi stocker par CODE_IRIS si disponible
             if 'IRIS_Meilleur' in row:
-                code = str(row['IRIS_Meilleur'])
-                scores_par_code[code] = score_max
-                details_par_code[code] = details
-            elif 'code_iris' in row:
-                code = str(row['code_iris'])
-                scores_par_code[code] = score_max
-                details_par_code[code] = details
-                
+                scores_par_code[str(row['IRIS_Meilleur'])] = row['Score_Max']
     elif st.session_state.top_quartiers is not None and not st.session_state.top_quartiers.empty:
         # Fallback sur le top 3
         for _, row in st.session_state.top_quartiers.iterrows():
@@ -1142,21 +1127,38 @@ else:
         
         # Essayer d'abord par code_iris, puis par nom_iris
         score = None
-        details = None
-        
         if code_iris_geo in scores_par_code:
             score = scores_par_code[code_iris_geo]
-            details = details_par_code.get(code_iris_geo)
         elif nom_iris in scores_par_nom:
             score = scores_par_nom[nom_iris]
-            details = details_par_nom.get(nom_iris)
         else:
             # Mode exploration : score aléatoire
             score = (hash(code_iris_geo) % 100) + 1
         
         # Obtenir la couleur basée sur le score normalisé
         color = get_color_from_score(score, min_score, max_score)
-        # Pas de popup, juste tooltip
+        
+        # Créer le popup avec les détails
+        nom_iris = feature['properties'].get('nom_iris', 'N/A')
+        code_iris = feature['properties'].get('iris', 'N/A')
+        
+        popup_text = f"""
+        <div style="font-family: Arial; width: 200px;">
+            <h4 style="margin: 0 0 10px 0; color: #121212;">{nom_iris}</h4>
+            <div style="background: {color}; padding: 8px; border-radius: 4px; margin-bottom: 10px;">
+                <p style="margin: 0; color: white; font-weight: bold;">Score: {score}/100</p>
+            </div>
+            <p style="margin: 5px 0; font-size: 12px; color: #6c6c6c;">
+                <strong>Code IRIS:</strong> {code_iris}
+            </p>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e8e8e8;">
+                <p style="margin: 0; font-size: 11px; color: #6c6c6c;">
+                    Compatibilité basée sur vos préférences
+                </p>
+            </div>
+        </div>
+        """
+        
         folium.GeoJson(
             {
                 "type": "Feature",
@@ -1177,6 +1179,8 @@ else:
                 "opacity": 1,
                 "fillOpacity": 0.8,
             },
+            popup=folium.Popup(popup_text, max_width=300),
+            tooltip=folium.Tooltip(f"{nom_iris} - Score: {score}/100"),
         ).add_to(m)
 
     # Afficher la carte dans Streamlit
@@ -1184,13 +1188,6 @@ else:
     
     # Afficher la carte avec hauteur personnalisée et récupérer les interactions
     map_result = st_folium(m, width=2600, height=500)
-    
-    # Panneau d'information en dehors de la carte
-    st.markdown("---")
-    st.markdown("### 📍 Cliquez sur un quartier pour voir les détails")
-    
-    # Créer un placeholder pour les informations
-    info_container = st.container()
 
     # --- Interactions: détecter clic et trouver le sous-quartier IRIS cliqué ---
     def _point_in_ring(x, y, ring):
@@ -1224,10 +1221,9 @@ else:
                             return feature
         return None
 
-    selected_feature = None
+    # Détection de clic sur la carte
     clicked = None
     if isinstance(map_result, dict):
-        # st_folium sometimes returns keys with different casings
         clicked = map_result.get("last_clicked") or map_result.get("lastClick") or map_result.get("last_object_clicked")
 
     if clicked and isinstance(clicked, dict):
@@ -1238,117 +1234,38 @@ else:
             lat = float(lat)
             lon = float(lon)
             selected_feature = find_feature_by_point(lon, lat, geojson_data.get("features", []))
+            if selected_feature:
+                props = selected_feature.get("properties", {})
+                nom_iris = props.get("nom_iris", "Zone")
+                # Mettre à jour le quartier sélectionné seulement si c'est un nouveau quartier
+                if st.session_state.selected_quartier != nom_iris:
+                    st.session_state.selected_quartier = nom_iris
+                    st.rerun()
         except Exception:
-            selected_feature = None
+            pass
 
-    # Si un sous-quartier est sélectionné, afficher les détails et annonces
-    if selected_feature:
-        props = selected_feature.get("properties", {})
-        nom_iris = props.get("nom_iris", "Zone")
-        code_iris = props.get("iris", props.get("code_iris", "N/A"))
-        code_iris_geo = props.get("code_iris", "N/A")
+    # Afficher les annonces du quartier sélectionné
+    if st.session_state.selected_quartier:
+        nom_iris = st.session_state.selected_quartier
 
-        with info_container:
-            # Afficher les détails du score si disponibles
-            details = None
-            score = None
-            
-            if code_iris_geo in details_par_code:
-                details = details_par_code[code_iris_geo]
-                score = details['score_total']
-            elif nom_iris in details_par_nom:
-                details = details_par_nom[nom_iris]
-                score = details['score_total']
-            
-            if details and score:
-                # Panneau détaillé des scores
-                rang = details.get('rang', '?')
-                color = get_color_from_score(score, min_score, max_score)
-                
-                st.markdown(f"### 📊 Analyse détaillée — {nom_iris}")
-                
-                col1, col2 = st.columns([1, 2])
-                
-                with col1:
-                    st.markdown(
-                        f"""
-                        <div style="background: linear-gradient(135deg, {color}, {color}dd); padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                            <div style="color: white; font-size: 48px; font-weight: bold; margin-bottom: 8px;">
-                                {score:.0f}<span style="font-size: 28px; opacity: 0.9;">/100</span>
-                            </div>
-                            <div style="color: white; font-size: 16px; opacity: 0.95;">
-                                Rang #{rang} / {len(st.session_state.tous_scores) if st.session_state.tous_scores is not None else '?'}
-                            </div>
-                            <div style="color: white; font-size: 12px; opacity: 0.85; margin-top: 8px;">
-                                Code: {code_iris}
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-                
-                with col2:
-                    # Normaliser les scores
-                    score_prix = min(details['score_prix'], 100)
-                    score_verts = min(details['score_espaces_verts'], 100)
-                    score_transports = min(details['score_transports'], 100)
-                    score_tranquillite = min(details['score_tranquillite'], 100)
-                    score_commerces = min(details['score_commerces'], 100)
-                    score_culture = min(details['score_culture'], 100)
-                    score_sport = min(details['score_sport'], 100)
-                    
-                    st.markdown("#### Décomposition du score")
-                    
-                    # Prix
-                    st.markdown("💰 **Prix**")
-                    st.progress(score_prix / 100)
-                    st.caption(f"{score_prix:.0f}/100")
-                    
-                    # Espaces verts
-                    st.markdown("🌳 **Espaces verts**")
-                    st.progress(score_verts / 100)
-                    st.caption(f"{score_verts:.0f}/100")
-                    
-                    # Transports
-                    st.markdown("🚇 **Transports**")
-                    st.progress(score_transports / 100)
-                    st.caption(f"{score_transports:.0f}/100")
-                    
-                    # Tranquillité
-                    st.markdown("🔇 **Tranquillité**")
-                    st.progress(score_tranquillite / 100)
-                    st.caption(f"{score_tranquillite:.0f}/100")
-                    
-                    # Commerces
-                    st.markdown("🏪 **Commerces**")
-                    st.progress(score_commerces / 100)
-                    st.caption(f"{score_commerces:.0f}/100")
-                    
-                    # Bars
-                    st.markdown("🍺 **Bars**")
-                    st.progress(score_culture / 100)
-                    st.caption(f"{score_culture:.0f}/100")
-                    
-                    # Sport
-                    st.markdown("🏃 **Sport**")
-                    st.progress(score_sport / 100)
-                    st.caption(f"{score_sport:.0f}/100")
-                    
-                    st.info("💡 **Calcul personnalisé** : Score pondéré selon vos réponses (budget, mobilité, nature, etc.) + bonus (familial, équilibre)")
-                
-                st.markdown("---")
-            
-                st.markdown(f"### 🏠 Offres disponibles — {nom_iris}")
+        st.markdown("---")
+        col_title, col_close = st.columns([4, 1])
+        with col_title:
+            st.markdown(f"### 🏠 Offres disponibles — {nom_iris}")
+        with col_close:
+            if st.button("✖️ Fermer", key="close_listings"):
+                st.session_state.selected_quartier = None
+                st.rerun()
 
-                # Scraper les annonces réelles
-                with st.spinner("Chargement des offres..."):
-                    annonces = scraper_immosens(secteur=nom_iris, max_annonces=10)
-            
-                if not annonces:
-                    st.info(f"Aucune offre trouvée pour {nom_iris}. Essayez un autre quartier.")
-                else:
-                    # Carrousel horizontal avec plusieurs offres d'annonces
-                    st.markdown(
+        # Scraper les annonces réelles
+        with st.spinner("Chargement des offres..."):
+            annonces = scraper_immosens(secteur=nom_iris, max_annonces=10)
+        
+        if not annonces:
+            st.info(f"Aucune offre trouvée pour {nom_iris}. Essayez un autre quartier.")
+        else:
+            # Carrousel horizontal avec plusieurs offres d'annonces
+            st.markdown(
                 """
                 <style>
                     .carousel-container {
@@ -1433,28 +1350,25 @@ else:
                 unsafe_allow_html=True,
             )
 
-                # Générer le HTML du carrousel avec les vraies données
-                cards_html = ""
-                for annonce in annonces:
-                    details = f"{annonce['pieces']}" if annonce['pieces'] != 'N/A' else ""
-                    if annonce['surface'] != 'N/A':
-                        details += f" • {annonce['surface']}"
-                    
-                    cards_html += f"""<div class="listing-card">
+            # Générer le HTML du carrousel avec les vraies données
+            cards_html = ""
+            for annonce in annonces:
+                details = f"{annonce['pieces']}" if annonce['pieces'] != 'N/A' else ""
+                if annonce['surface'] != 'N/A':
+                    details += f" • {annonce['surface']}"
+                
+                cards_html += f"""<div class="listing-card">
     <div class="listing-image" style="background-image: url('{annonce['image']}');"></div>
     <div class="listing-title">{annonce['type']}</div>
     <div class="listing-location">{annonce['localisation']} {details}</div>
     <div class="listing-price" style="color: #ff5a5f;">{annonce['prix']}</div>
     <a href="{annonce['lien']}" target="_blank" class="listing-link">Voir l'offre</a>
 </div>"""
-                
-                    listings_html = f'<div class="carousel-container">{cards_html}</div>'
-                    st.markdown(listings_html, unsafe_allow_html=True)
-                    st.markdown("\n---\n")
-    
-    else:
-        with info_container:
-            st.info("👆 Cliquez sur un quartier de la carte pour voir ses détails et les offres disponibles.")
+            
+            listings_html = f'<div class="carousel-container">{cards_html}</div>'
+
+            st.markdown(listings_html, unsafe_allow_html=True)
+            st.markdown("\n---\n")
 
     st.markdown("---")
 
