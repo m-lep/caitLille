@@ -1344,11 +1344,11 @@ else:
                 with st.spinner("Chargement des offres..."):
                     annonces = scraper_immosens(secteur=nom_iris, max_annonces=10)
             
-            if not annonces:
-                st.info(f"Aucune offre trouvée pour {nom_iris}. Essayez un autre quartier.")
-            else:
-                # Carrousel horizontal avec plusieurs offres d'annonces
-                st.markdown(
+                if not annonces:
+                    st.info(f"Aucune offre trouvée pour {nom_iris}. Essayez un autre quartier.")
+                else:
+                    # Carrousel horizontal avec plusieurs offres d'annonces
+                    st.markdown(
                 """
                 <style>
                     .carousel-container {
@@ -1448,9 +1448,9 @@ else:
     <a href="{annonce['lien']}" target="_blank" class="listing-link">Voir l'offre</a>
 </div>"""
                 
-                listings_html = f'<div class="carousel-container">{cards_html}</div>'
-                st.markdown(listings_html, unsafe_allow_html=True)
-                st.markdown("\n---\n")
+                    listings_html = f'<div class="carousel-container">{cards_html}</div>'
+                    st.markdown(listings_html, unsafe_allow_html=True)
+                    st.markdown("\n---\n")
     
     else:
         with info_container:
