@@ -1165,95 +1165,98 @@ else:
         if details:
             # Popup avec décomposition complète
             rang = details.get('rang', '?')
+            
+            # Normaliser les scores sur 100 max
+            score_prix = min(details['score_prix'], 100)
+            score_verts = min(details['score_espaces_verts'], 100)
+            score_transports = min(details['score_transports'], 100)
+            score_tranquillite = min(details['score_tranquillite'], 100)
+            score_commerces = min(details['score_commerces'], 100)
+            score_culture = min(details['score_culture'], 100)
+            score_sport = min(details['score_sport'], 100)
+            
             popup_text = f"""
-            <div style="font-family: Arial, sans-serif; width: 450px; padding: 5px;">
-                <h3 style="margin: 0 0 12px 0; color: #121212; font-size: 18px; border-bottom: 2px solid {color}; padding-bottom: 8px;">
+            <div style="font-family: Arial, sans-serif; width: 320px; padding: 4px;">
+                <h3 style="margin: 0 0 8px 0; color: #121212; font-size: 15px; border-bottom: 2px solid {color}; padding-bottom: 6px;">
                     {nom_iris}
                 </h3>
                 
-                <div style="background: linear-gradient(135deg, {color}dd, {color}); padding: 12px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                    <div style="color: white; font-size: 28px; font-weight: bold; text-align: center;">
-                        {score:.0f}<span style="font-size: 18px; opacity: 0.9;">/100</span>
+                <div style="background: linear-gradient(135deg, {color}dd, {color}); padding: 10px; border-radius: 6px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="color: white; font-size: 24px; font-weight: bold; text-align: center;">
+                        {score:.0f}<span style="font-size: 14px; opacity: 0.9;">/100</span>
                     </div>
-                    <div style="color: white; font-size: 12px; text-align: center; opacity: 0.95; margin-top: 4px;">
+                    <div style="color: white; font-size: 11px; text-align: center; opacity: 0.95; margin-top: 2px;">
                         Rang #{rang} sur {len(st.session_state.tous_scores) if st.session_state.tous_scores is not None else '?'}
                     </div>
                 </div>
                 
-                <div style="margin-bottom: 12px;">
-                    <h4 style="margin: 0 0 8px 0; color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
-                        📊 Décomposition du score
+                <div style="margin-bottom: 10px;">
+                    <h4 style="margin: 0 0 6px 0; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;">
+                        📊 Décomposition
                     </h4>
                     
-                    <div style="background: #f8f9fa; border-radius: 6px; padding: 10px;">
-                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; color: #555;">💰 Prix</span>
-                            <div style="flex: 1; margin: 0 10px; background: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #fbbf24, #f59e0b); width: {min(details['score_prix'], 100)}%; height: 100%;"></div>
+                    <div style="background: #f8f9fa; border-radius: 4px; padding: 8px;">
+                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; color: #555; width: 90px;">💰 Prix</span>
+                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #fbbf24, #f59e0b); width: {score_prix}%; height: 100%;"></div>
                             </div>
-                            <span style="font-size: 12px; font-weight: bold; color: #333; min-width: 35px; text-align: right;">{details['score_prix']:.0f}</span>
+                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_prix:.0f}</span>
                         </div>
                         
-                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; color: #555;">🌳 Espaces verts</span>
-                            <div style="flex: 1; margin: 0 10px; background: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #10b981, #059669); width: {min(details['score_espaces_verts'], 100)}%; height: 100%;"></div>
+                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; color: #555; width: 90px;">🌳 Espaces verts</span>
+                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #10b981, #059669); width: {score_verts}%; height: 100%;"></div>
                             </div>
-                            <span style="font-size: 12px; font-weight: bold; color: #333; min-width: 35px; text-align: right;">{details['score_espaces_verts']:.0f}</span>
+                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_verts:.0f}</span>
                         </div>
                         
-                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; color: #555;">🚇 Transports</span>
-                            <div style="flex: 1; margin: 0 10px; background: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #3b82f6, #2563eb); width: {min(details['score_transports'], 100)}%; height: 100%;"></div>
+                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; color: #555; width: 90px;">🚇 Transports</span>
+                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #3b82f6, #2563eb); width: {score_transports}%; height: 100%;"></div>
                             </div>
-                            <span style="font-size: 12px; font-weight: bold; color: #333; min-width: 35px; text-align: right;">{details['score_transports']:.0f}</span>
+                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_transports:.0f}</span>
                         </div>
                         
-                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; color: #555;">🔇 Tranquillité</span>
-                            <div style="flex: 1; margin: 0 10px; background: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #a855f7, #9333ea); width: {min(details['score_tranquillite'], 100)}%; height: 100%;"></div>
+                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; color: #555; width: 90px;">🔇 Tranquillité</span>
+                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #a855f7, #9333ea); width: {score_tranquillite}%; height: 100%;"></div>
                             </div>
-                            <span style="font-size: 12px; font-weight: bold; color: #333; min-width: 35px; text-align: right;">{details['score_tranquillite']:.0f}</span>
+                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_tranquillite:.0f}</span>
                         </div>
                         
-                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; color: #555;">🏪 Commerces</span>
-                            <div style="flex: 1; margin: 0 10px; background: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #ec4899, #db2777); width: {min(details['score_commerces'], 100)}%; height: 100%;"></div>
+                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; color: #555; width: 90px;">🏪 Commerces</span>
+                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #ec4899, #db2777); width: {score_commerces}%; height: 100%;"></div>
                             </div>
-                            <span style="font-size: 12px; font-weight: bold; color: #333; min-width: 35px; text-align: right;">{details['score_commerces']:.0f}</span>
+                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_commerces:.0f}</span>
                         </div>
                         
-                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; color: #555;">🎭 Culture</span>
-                            <div style="flex: 1; margin: 0 10px; background: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #8b5cf6, #7c3aed); width: {min(details['score_culture'], 100)}%; height: 100%;"></div>
+                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; color: #555; width: 90px;">🎭 Culture</span>
+                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #8b5cf6, #7c3aed); width: {score_culture}%; height: 100%;"></div>
                             </div>
-                            <span style="font-size: 12px; font-weight: bold; color: #333; min-width: 35px; text-align: right;">{details['score_culture']:.0f}</span>
+                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_culture:.0f}</span>
                         </div>
                         
-                        <div style="margin: 6px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; color: #555;">🏃 Sport</span>
-                            <div style="flex: 1; margin: 0 10px; background: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #14b8a6, #0d9488); width: {min(details['score_sport'], 100)}%; height: 100%;"></div>
+                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; color: #555; width: 90px;">🏃 Sport</span>
+                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #14b8a6, #0d9488); width: {score_sport}%; height: 100%;"></div>
                             </div>
-                            <span style="font-size: 12px; font-weight: bold; color: #333; min-width: 35px; text-align: right;">{details['score_sport']:.0f}</span>
+                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_sport:.0f}</span>
                         </div>
                     </div>
                 </div>
                 
-                <div style="margin-top: 12px; padding: 10px; background: #f0f9ff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-                    <p style="margin: 0; font-size: 11px; color: #1e40af; line-height: 1.4;">
-                        <strong>💡 Comment est calculé ce score ?</strong><br>
-                        Chaque critère est pondéré selon vos réponses au questionnaire. Les quartiers avec bonus (familial, équilibre) ont des points supplémentaires.
-                    </p>
-                </div>
-                
-                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #e8e8e8;">
-                    <p style="margin: 0; font-size: 10px; color: #999;">
-                        <strong>Code IRIS:</strong> {code_iris}
+                <div style="margin-top: 8px; padding: 6px; background: #f0f9ff; border-left: 2px solid #3b82f6; border-radius: 3px;">
+                    <p style="margin: 0; font-size: 9px; color: #1e40af; line-height: 1.3;">
+                        <strong>💡 Score calculé</strong> selon vos réponses (pondération + bonus)
                     </p>
                 </div>
             </div>
@@ -1297,7 +1300,7 @@ else:
                 "opacity": 1,
                 "fillOpacity": 0.8,
             },
-            popup=folium.Popup(popup_text, max_width=500),
+            popup=folium.Popup(popup_text, max_width=350),
             tooltip=folium.Tooltip(f"{nom_iris} - Score: {score:.0f}/100"),
         ).add_to(m)
 
