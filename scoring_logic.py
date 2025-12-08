@@ -430,13 +430,23 @@ def recommander_quartiers(reponses_utilisateur: Dict, iris_data_raw: pd.DataFram
     top_resultats = resultats.head(top_n).copy()
     
     # Ajouter la colonne NOM_IRIS si elle existe dans les données brutes
-    if 'NOM_IRIS' in iris_data_raw.columns:
-        top_resultats = top_resultats.merge(
-            iris_data_raw[['CODE_IRIS', 'NOM_IRIS']].drop_duplicates(),
-            left_on='code_iris',
-            right_on='CODE_IRIS',
-            how='left'
-        )
+    if 'NOM_IRIS' in iris_data_raw.columns and 'CODE_IRIS' in iris_data_raw.columns:
+        try:
+            # S'assurer que les deux colonnes sont du même type (string)
+            iris_lookup = iris_data_raw[['CODE_IRIS', 'NOM_IRIS']].copy()
+            iris_lookup['CODE_IRIS'] = iris_lookup['CODE_IRIS'].astype(str)
+            iris_lookup = iris_lookup.drop_duplicates()
+            
+            top_resultats = top_resultats.merge(
+                iris_lookup,
+                left_on='code_iris',
+                right_on='CODE_IRIS',
+                how='left'
+            )
+        except Exception as e:
+            print(f"Erreur lors du merge NOM_IRIS: {e}")
+            # En cas d'erreur, on continue sans le nom
+            pass
     
     # Renommer pour compatibilité
     top_resultats['Score_Max'] = top_resultats['score_total']
