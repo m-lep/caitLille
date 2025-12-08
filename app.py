@@ -1258,8 +1258,7 @@ else:
                 score = quartier_data.iloc[0]['Score_Max']
                 
                 # Calculer les détails du scoring
-                if st.session_state.matrice_data is not None:
-                    from scoring_logic import consolider_poids_utilisateur
+                if st.session_state.matrice_data is not None and len(st.session_state.reponses) > 0:
                     poids = consolider_poids_utilisateur(st.session_state.reponses)
                     
                     # Trouver la ligne correspondante dans la matrice
@@ -1269,12 +1268,29 @@ else:
                         contributions = {}
                         total_poids = sum(poids.values())
                         
+                        # Traductions françaises des critères
+                        traductions = {
+                            'Norm_Bruit': '🔇 Calme (peu de bruit)',
+                            'Norm_Prix': '💰 Prix abordable',
+                            'Norm_Surface_Verte_m2': '🌳 Espaces verts',
+                            'Norm_Nb_Pharmacies': '💊 Pharmacies',
+                            'Norm_Nb_Commerces': '🏪 Commerces',
+                            'Norm_Nb_Restaurants': '🍽️ Restaurants',
+                            'Norm_Nb_Transports': '🚇 Transports en commun',
+                            'Norm_Nb_VLille': '🚴 Stations V\'Lille',
+                            'Norm_Nb_ParcsEnfants': '👶 Aires de jeux',
+                            'Norm_Nb_ComplexesSportifs': '⚽ Complexes sportifs',
+                            'Norm_Nb_Ecoles': '🏫 Écoles',
+                            'Norm_Nb_Bars': '🍺 Bars & vie nocturne',
+                            'Norm_Nb_Parkings': '🅿️ Parkings',
+                        }
+                        
                         for critere, poids_critere in poids.items():
                             if poids_critere > 0 and critere in quartier_row.columns:
                                 valeur_normalisee = quartier_row.iloc[0][critere]
                                 contribution = (valeur_normalisee * poids_critere / total_poids) * 100
-                                # Traduire le nom du critère en français
-                                nom_francais = critere.replace('Norm_', '').replace('_', ' ')
+                                # Utiliser la traduction française avec emoji
+                                nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
                                 contributions[nom_francais] = contribution
                         
                         # Afficher l'explication du score
@@ -1296,6 +1312,7 @@ else:
                         if contributions:
                             top_contributions = sorted(contributions.items(), key=lambda x: x[1], reverse=True)[:5]
                             st.markdown("**🎯 Principaux facteurs influençant ce score :**")
+                            st.caption(f"_Poids total appliqué : {sum(poids.values())} points répartis sur {len([p for p in poids.values() if p > 0])} critères_")
                             for nom_critere, contribution in top_contributions:
                                 bar_width = min(contribution, 100)  # Cap à 100%
                                 st.markdown(
