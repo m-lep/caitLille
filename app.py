@@ -1156,130 +1156,7 @@ else:
         
         # Obtenir la couleur basée sur le score normalisé
         color = get_color_from_score(score, min_score, max_score)
-        
-        # Créer le popup avec les détails
-        nom_iris = feature['properties'].get('nom_iris', 'N/A')
-        code_iris = feature['properties'].get('iris', 'N/A')
-        
-        # Popup détaillé avec explication du score
-        if details:
-            # Popup avec décomposition complète
-            rang = details.get('rang', '?')
-            
-            # Normaliser les scores sur 100 max
-            score_prix = min(details['score_prix'], 100)
-            score_verts = min(details['score_espaces_verts'], 100)
-            score_transports = min(details['score_transports'], 100)
-            score_tranquillite = min(details['score_tranquillite'], 100)
-            score_commerces = min(details['score_commerces'], 100)
-            score_culture = min(details['score_culture'], 100)
-            score_sport = min(details['score_sport'], 100)
-            
-            popup_text = f"""
-            <div style="font-family: Arial, sans-serif; width: 320px; padding: 4px;">
-                <h3 style="margin: 0 0 8px 0; color: #121212; font-size: 15px; border-bottom: 2px solid {color}; padding-bottom: 6px;">
-                    {nom_iris}
-                </h3>
-                
-                <div style="background: linear-gradient(135deg, {color}dd, {color}); padding: 10px; border-radius: 6px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <div style="color: white; font-size: 24px; font-weight: bold; text-align: center;">
-                        {score:.0f}<span style="font-size: 14px; opacity: 0.9;">/100</span>
-                    </div>
-                    <div style="color: white; font-size: 11px; text-align: center; opacity: 0.95; margin-top: 2px;">
-                        Rang #{rang} sur {len(st.session_state.tous_scores) if st.session_state.tous_scores is not None else '?'}
-                    </div>
-                </div>
-                
-                <div style="margin-bottom: 10px;">
-                    <h4 style="margin: 0 0 6px 0; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;">
-                        📊 Décomposition
-                    </h4>
-                    
-                    <div style="background: #f8f9fa; border-radius: 4px; padding: 8px;">
-                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 11px; color: #555; width: 90px;">💰 Prix</span>
-                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #fbbf24, #f59e0b); width: {score_prix}%; height: 100%;"></div>
-                            </div>
-                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_prix:.0f}</span>
-                        </div>
-                        
-                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 11px; color: #555; width: 90px;">🌳 Espaces verts</span>
-                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #10b981, #059669); width: {score_verts}%; height: 100%;"></div>
-                            </div>
-                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_verts:.0f}</span>
-                        </div>
-                        
-                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 11px; color: #555; width: 90px;">🚇 Transports</span>
-                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #3b82f6, #2563eb); width: {score_transports}%; height: 100%;"></div>
-                            </div>
-                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_transports:.0f}</span>
-                        </div>
-                        
-                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 11px; color: #555; width: 90px;">🔇 Tranquillité</span>
-                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #a855f7, #9333ea); width: {score_tranquillite}%; height: 100%;"></div>
-                            </div>
-                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_tranquillite:.0f}</span>
-                        </div>
-                        
-                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 11px; color: #555; width: 90px;">🏪 Commerces</span>
-                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #ec4899, #db2777); width: {score_commerces}%; height: 100%;"></div>
-                            </div>
-                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_commerces:.0f}</span>
-                        </div>
-                        
-                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 11px; color: #555; width: 90px;">🎭 Culture</span>
-                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #8b5cf6, #7c3aed); width: {score_culture}%; height: 100%;"></div>
-                            </div>
-                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_culture:.0f}</span>
-                        </div>
-                        
-                        <div style="margin: 5px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 11px; color: #555; width: 90px;">🏃 Sport</span>
-                            <div style="flex: 1; margin: 0 8px; background: #e0e0e0; border-radius: 8px; height: 6px; overflow: hidden;">
-                                <div style="background: linear-gradient(90deg, #14b8a6, #0d9488); width: {score_sport}%; height: 100%;"></div>
-                            </div>
-                            <span style="font-size: 11px; font-weight: bold; color: #333; min-width: 28px; text-align: right;">{score_sport:.0f}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 8px; padding: 6px; background: #f0f9ff; border-left: 2px solid #3b82f6; border-radius: 3px;">
-                    <p style="margin: 0; font-size: 9px; color: #1e40af; line-height: 1.3;">
-                        <strong>💡 Score calculé</strong> selon vos réponses (pondération + bonus)
-                    </p>
-                </div>
-            </div>
-            """
-        else:
-            # Popup simple pour mode exploration
-            popup_text = f"""
-            <div style="font-family: Arial; width: 200px;">
-                <h4 style="margin: 0 0 10px 0; color: #121212;">{nom_iris}</h4>
-                <div style="background: {color}; padding: 8px; border-radius: 4px; margin-bottom: 10px;">
-                    <p style="margin: 0; color: white; font-weight: bold;">Score: {score}/100</p>
-                </div>
-                <p style="margin: 5px 0; font-size: 12px; color: #6c6c6c;">
-                    <strong>Code IRIS:</strong> {code_iris}
-                </p>
-                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e8e8e8;">
-                    <p style="margin: 0; font-size: 11px; color: #6c6c6c;">
-                        Répondez au questionnaire pour voir les détails
-                    </p>
-                </div>
-            </div>
-            """
-        
+        # Pas de popup, juste tooltip
         folium.GeoJson(
             {
                 "type": "Feature",
@@ -1300,8 +1177,6 @@ else:
                 "opacity": 1,
                 "fillOpacity": 0.8,
             },
-            popup=folium.Popup(popup_text, max_width=350),
-            tooltip=folium.Tooltip(f"{nom_iris} - Score: {score:.0f}/100"),
         ).add_to(m)
 
     # Afficher la carte dans Streamlit
@@ -1309,6 +1184,13 @@ else:
     
     # Afficher la carte avec hauteur personnalisée et récupérer les interactions
     map_result = st_folium(m, width=2600, height=500)
+    
+    # Panneau d'information en dehors de la carte
+    st.markdown("---")
+    st.markdown("### 📍 Cliquez sur un quartier pour voir les détails")
+    
+    # Créer un placeholder pour les informations
+    info_container = st.container()
 
     # --- Interactions: détecter clic et trouver le sous-quartier IRIS cliqué ---
     def _point_in_ring(x, y, ring):
@@ -1359,24 +1241,147 @@ else:
         except Exception:
             selected_feature = None
 
-    # Si un sous-quartier est sélectionné, afficher des templates d'annonces dessous
+    # Si un sous-quartier est sélectionné, afficher les détails et annonces
     if selected_feature:
         props = selected_feature.get("properties", {})
         nom_iris = props.get("nom_iris", "Zone")
         code_iris = props.get("iris", props.get("code_iris", "N/A"))
+        code_iris_geo = props.get("code_iris", "N/A")
 
-        st.markdown("---")
-        st.markdown(f"### 🏠 Offres disponibles — {nom_iris}")
+        with info_container:
+            # Afficher les détails du score si disponibles
+            details = None
+            score = None
+            
+            if code_iris_geo in details_par_code:
+                details = details_par_code[code_iris_geo]
+                score = details['score_total']
+            elif nom_iris in details_par_nom:
+                details = details_par_nom[nom_iris]
+                score = details['score_total']
+            
+            if details and score:
+                # Panneau détaillé des scores
+                rang = details.get('rang', '?')
+                color = get_color_from_score(score, min_score, max_score)
+                
+                st.markdown(f"### 📊 Analyse détaillée — {nom_iris}")
+                
+                col1, col2 = st.columns([1, 2])
+                
+                with col1:
+                    st.markdown(
+                        f"""
+                        <div style="background: linear-gradient(135deg, {color}, {color}dd); padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                            <div style="color: white; font-size: 48px; font-weight: bold; margin-bottom: 8px;">
+                                {score:.0f}<span style="font-size: 28px; opacity: 0.9;">/100</span>
+                            </div>
+                            <div style="color: white; font-size: 16px; opacity: 0.95;">
+                                Rang #{rang} / {len(st.session_state.tous_scores) if st.session_state.tous_scores is not None else '?'}
+                            </div>
+                            <div style="color: white; font-size: 12px; opacity: 0.85; margin-top: 8px;">
+                                Code: {code_iris}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                
+                with col2:
+                    # Normaliser les scores
+                    score_prix = min(details['score_prix'], 100)
+                    score_verts = min(details['score_espaces_verts'], 100)
+                    score_transports = min(details['score_transports'], 100)
+                    score_tranquillite = min(details['score_tranquillite'], 100)
+                    score_commerces = min(details['score_commerces'], 100)
+                    score_culture = min(details['score_culture'], 100)
+                    score_sport = min(details['score_sport'], 100)
+                    
+                    st.markdown(
+                        f"""
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                            <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">Décomposition du score</h4>
+                            
+                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
+                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">💰 Prix</span>
+                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
+                                    <div style="background: linear-gradient(90deg, #fbbf24, #f59e0b); width: {score_prix}%; height: 100%; transition: width 0.3s;"></div>
+                                </div>
+                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_prix:.0f}</span>
+                            </div>
+                            
+                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
+                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🌳 Espaces verts</span>
+                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
+                                    <div style="background: linear-gradient(90deg, #10b981, #059669); width: {score_verts}%; height: 100%; transition: width 0.3s;"></div>
+                                </div>
+                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_verts:.0f}</span>
+                            </div>
+                            
+                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
+                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🚇 Transports</span>
+                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
+                                    <div style="background: linear-gradient(90deg, #3b82f6, #2563eb); width: {score_transports}%; height: 100%; transition: width 0.3s;"></div>
+                                </div>
+                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_transports:.0f}</span>
+                            </div>
+                            
+                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
+                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🔇 Tranquillité</span>
+                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
+                                    <div style="background: linear-gradient(90deg, #a855f7, #9333ea); width: {score_tranquillite}%; height: 100%; transition: width 0.3s;"></div>
+                                </div>
+                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_tranquillite:.0f}</span>
+                            </div>
+                            
+                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
+                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🏪 Commerces</span>
+                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
+                                    <div style="background: linear-gradient(90deg, #ec4899, #db2777); width: {score_commerces}%; height: 100%; transition: width 0.3s;"></div>
+                                </div>
+                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_commerces:.0f}</span>
+                            </div>
+                            
+                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
+                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🎭 Culture</span>
+                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
+                                    <div style="background: linear-gradient(90deg, #8b5cf6, #7c3aed); width: {score_culture}%; height: 100%; transition: width 0.3s;"></div>
+                                </div>
+                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_culture:.0f}</span>
+                            </div>
+                            
+                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
+                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🏃 Sport</span>
+                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
+                                    <div style="background: linear-gradient(90deg, #14b8a6, #0d9488); width: {score_sport}%; height: 100%; transition: width 0.3s;"></div>
+                                </div>
+                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_sport:.0f}</span>
+                            </div>
+                            
+                            <div style="margin-top: 15px; padding: 12px; background: #f0f9ff; border-left: 3px solid #3b82f6; border-radius: 4px;">
+                                <p style="margin: 0; font-size: 12px; color: #1e40af; line-height: 1.5;">
+                                    <strong>💡 Calcul personnalisé</strong><br>
+                                    Score pondéré selon vos réponses (budget, mobilité, nature, etc.) + bonus (familial, équilibre)
+                                </p>
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                
+                st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+            
+                st.markdown(f"### 🏠 Offres disponibles — {nom_iris}")
 
-        # Scraper les annonces réelles
-        with st.spinner("Chargement des offres..."):
-            annonces = scraper_immosens(secteur=nom_iris, max_annonces=10)
-        
-        if not annonces:
-            st.info(f"Aucune offre trouvée pour {nom_iris}. Essayez un autre quartier.")
-        else:
-            # Carrousel horizontal avec plusieurs offres d'annonces
-            st.markdown(
+                # Scraper les annonces réelles
+                with st.spinner("Chargement des offres..."):
+                    annonces = scraper_immosens(secteur=nom_iris, max_annonces=10)
+            
+            if not annonces:
+                st.info(f"Aucune offre trouvée pour {nom_iris}. Essayez un autre quartier.")
+            else:
+                # Carrousel horizontal avec plusieurs offres d'annonces
+                st.markdown(
                 """
                 <style>
                     .carousel-container {
@@ -1475,11 +1480,15 @@ else:
     <div class="listing-price" style="color: #ff5a5f;">{annonce['prix']}</div>
     <a href="{annonce['lien']}" target="_blank" class="listing-link">Voir l'offre</a>
 </div>"""
-            
-            listings_html = f'<div class="carousel-container">{cards_html}</div>'
+                    
+                listings_html = f'<div class="carousel-container">{cards_html}</div>'
 
-            st.markdown(listings_html, unsafe_allow_html=True)
-            st.markdown("\n---\n")
+                st.markdown(listings_html, unsafe_allow_html=True)
+                st.markdown("\n---\n")
+    
+    else:
+        with info_container:
+            st.info("👆 Cliquez sur un quartier de la carte pour voir ses détails et les offres disponibles.")
 
     st.markdown("---")
 
