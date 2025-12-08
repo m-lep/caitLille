@@ -1297,79 +1297,46 @@ else:
                     score_culture = min(details['score_culture'], 100)
                     score_sport = min(details['score_sport'], 100)
                     
-                    st.markdown(
-                        f"""
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                            <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">Décomposition du score</h4>
-                            
-                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">💰 Prix</span>
-                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
-                                    <div style="background: linear-gradient(90deg, #fbbf24, #f59e0b); width: {score_prix}%; height: 100%; transition: width 0.3s;"></div>
-                                </div>
-                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_prix:.0f}</span>
-                            </div>
-                            
-                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🌳 Espaces verts</span>
-                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
-                                    <div style="background: linear-gradient(90deg, #10b981, #059669); width: {score_verts}%; height: 100%; transition: width 0.3s;"></div>
-                                </div>
-                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_verts:.0f}</span>
-                            </div>
-                            
-                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🚇 Transports</span>
-                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
-                                    <div style="background: linear-gradient(90deg, #3b82f6, #2563eb); width: {score_transports}%; height: 100%; transition: width 0.3s;"></div>
-                                </div>
-                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_transports:.0f}</span>
-                            </div>
-                            
-                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🔇 Tranquillité</span>
-                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
-                                    <div style="background: linear-gradient(90deg, #a855f7, #9333ea); width: {score_tranquillite}%; height: 100%; transition: width 0.3s;"></div>
-                                </div>
-                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_tranquillite:.0f}</span>
-                            </div>
-                            
-                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🏪 Commerces</span>
-                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
-                                    <div style="background: linear-gradient(90deg, #ec4899, #db2777); width: {score_commerces}%; height: 100%; transition: width 0.3s;"></div>
-                                </div>
-                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_commerces:.0f}</span>
-                            </div>
-                            
-                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🎭 Culture</span>
-                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
-                                    <div style="background: linear-gradient(90deg, #8b5cf6, #7c3aed); width: {score_culture}%; height: 100%; transition: width 0.3s;"></div>
-                                </div>
-                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_culture:.0f}</span>
-                            </div>
-                            
-                            <div style="margin: 10px 0; display: flex; align-items: center; gap: 12px;">
-                                <span style="font-size: 13px; color: #555; width: 120px; font-weight: 500;">🏃 Sport</span>
-                                <div style="flex: 1; background: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
-                                    <div style="background: linear-gradient(90deg, #14b8a6, #0d9488); width: {score_sport}%; height: 100%; transition: width 0.3s;"></div>
-                                </div>
-                                <span style="font-size: 14px; font-weight: bold; color: #333; min-width: 40px; text-align: right;">{score_sport:.0f}</span>
-                            </div>
-                            
-                            <div style="margin-top: 15px; padding: 12px; background: #f0f9ff; border-left: 3px solid #3b82f6; border-radius: 4px;">
-                                <p style="margin: 0; font-size: 12px; color: #1e40af; line-height: 1.5;">
-                                    <strong>💡 Calcul personnalisé</strong><br>
-                                    Score pondéré selon vos réponses (budget, mobilité, nature, etc.) + bonus (familial, équilibre)
-                                </p>
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                    st.markdown("#### Décomposition du score")
+                    
+                    # Prix
+                    st.markdown("💰 **Prix**")
+                    st.progress(score_prix / 100)
+                    st.caption(f"{score_prix:.0f}/100")
+                    
+                    # Espaces verts
+                    st.markdown("🌳 **Espaces verts**")
+                    st.progress(score_verts / 100)
+                    st.caption(f"{score_verts:.0f}/100")
+                    
+                    # Transports
+                    st.markdown("🚇 **Transports**")
+                    st.progress(score_transports / 100)
+                    st.caption(f"{score_transports:.0f}/100")
+                    
+                    # Tranquillité
+                    st.markdown("🔇 **Tranquillité**")
+                    st.progress(score_tranquillite / 100)
+                    st.caption(f"{score_tranquillite:.0f}/100")
+                    
+                    # Commerces
+                    st.markdown("🏪 **Commerces**")
+                    st.progress(score_commerces / 100)
+                    st.caption(f"{score_commerces:.0f}/100")
+                    
+                    # Culture
+                    st.markdown("🎭 **Culture**")
+                    st.progress(score_culture / 100)
+                    st.caption(f"{score_culture:.0f}/100")
+                    
+                    # Sport
+                    st.markdown("🏃 **Sport**")
+                    st.progress(score_sport / 100)
+                    st.caption(f"{score_sport:.0f}/100")
+                    
+                    st.info("💡 **Calcul personnalisé** : Score pondéré selon vos réponses (budget, mobilité, nature, etc.) + bonus (familial, équilibre)")
                 
-                st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
+                st.markdown("---")
             
                 st.markdown(f"### 🏠 Offres disponibles — {nom_iris}")
 
