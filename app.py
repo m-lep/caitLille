@@ -780,13 +780,13 @@ def next_question():
             st.session_state.top_quartiers = recommander_quartiers(
                 st.session_state.reponses, 
                 st.session_state.matrice_data, 
-                n_recommandations=3
+                top_n=3
             )
             # Calculer TOUS les scores pour la carte
             st.session_state.tous_scores = recommander_quartiers(
                 st.session_state.reponses, 
                 st.session_state.matrice_data, 
-                n_recommandations=110  # Tous les quartiers
+                top_n=110  # Tous les quartiers
             )
 
 
