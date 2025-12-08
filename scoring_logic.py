@@ -1,114 +1,61 @@
+"""
+Algorithme de Recommandation d'IRIS - Métropole de Lille (VERSION CORRIGÉE v2)
+===============================================================================
+
+Utilise UNIQUEMENT les vraies données du fichier Excel, sans invention.
+Système de scoring multi-critères avec anti-monopole pour garantir équité.
+"""
+
 import pandas as pd
 import numpy as np
+import math
+from typing import Dict, List, Tuple
+from dataclasses import dataclass, field
+
 
 # --------------------------------------------------------------------------
-# --- I. CONFIGURATION GLOBALE ---
+# --- CONFIGURATION GLOBALE ---
 # --------------------------------------------------------------------------
 
 FICHIER_MATRICE = 'DATASET scores brut.xlsx'
-NOM_FEUILLE = 'Matrice_Brute_Normalisee'
 
-# 1. Tous les critères normalisés de votre matrice Excel
-TOUS_LES_CRITERES_NORMALISES = [
-    'Norm_Bruit', 'Norm_Prix', 'Norm_Surface_Verte_m2', 'Norm_Nb_Pharmacies',
-    'Norm_Nb_Commerces', 'Norm_Nb_Restaurants', 'Norm_Nb_Transports',
-    'Norm_Nb_VLille', 'Norm_Nb_ParcsEnfants', 'Norm_Nb_ComplexesSportifs',
-    'Norm_Nb_Ecoles', 'Norm_Nb_Bars', 'Norm_Nb_Parkings'
-]
 
-# 2. Les 4 boutons représentent le niveau d'intérêt (1 à 4)
-# 😤 (bouton 1) = Pas intéressé (poids 1)
-# 😕 (bouton 2) = Moyen intéressé (poids 2)
-# 😊 (bouton 3) = Intéressé (poids 3)
-# 🤩 (bouton 4) = Très intéressé (poids 4)
-# Le poids est déterminé par la position du bouton cliqué, pas par le texte affiché
+class CriterePonderation:
+    """Définit l'importance relative des différents critères"""
+    PRIX = 1.0
+    TRANSPORTS = 2.0
+    ESPACES_VERTS = 1.5
+    SECURITE = 2.0
+    COMMERCES = 1.5
+    CULTURE = 1.5
+    SPORT = 1.0
 
-# 3. Logique de Scoring exacte de l'algorithme fourni
-LOGIQUE_SCORING = {
-    # Q1 : Ambiance
-    'Paisible & proche de la nature': ['Norm_Surface_Verte_m2', 'Norm_Bruit', 'Norm_Nb_ParcsEnfants'],
-    'Calme mais avec un peu de vie': ['Norm_Bruit', 'Norm_Nb_Commerces', 'Norm_Nb_Restaurants'],
-    'Urbain & dynamique': ['Norm_Nb_Commerces', 'Norm_Nb_Restaurants', 'Norm_Nb_Bars', 'Norm_Nb_Transports'],
-    'Très animé (bars, sorties, nightlife)': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants', 'Norm_Nb_Transports'],
 
-    # Q2 : Déplacement
-    'Transports en commun': ['Norm_Nb_Transports', 'Norm_Nb_VLille'],
-    'Vélo / V\'Lille': ['Norm_Nb_VLille', 'Norm_Nb_Transports'],
-    'Voiture': ['Norm_Nb_Parkings'],
-    'À pied': ['Norm_Nb_Commerces', 'Norm_Nb_Restaurants'],
-
-    # Q3 : Bruit
-    'Très sensible': ['Norm_Bruit'],
-    'Un peu sensible': ['Norm_Bruit'],
-    'Ça m\'est égal': [],
-    'J\'aime quand ça bouge': ['Norm_Nb_Bars'],
-
-    # Q4 : Espaces Verts
-    'Pas important': [],
-    'Un peu important': ['Norm_Surface_Verte_m2'],
-    'Très important': ['Norm_Surface_Verte_m2'],
-    'Essentiel dans mon quotidien': ['Norm_Surface_Verte_m2', 'Norm_Bruit'],
-
-    # Q5 : Budget Logement
-    'Serré': ['Norm_Prix'],
-    'Modéré': ['Norm_Prix'],
-    'Confortable': ['Norm_Prix'],
-    'Flexible': [],
-
-    # Q6 : Repas
-    'Je cuisine souvent': ['Norm_Nb_Commerces'],
-    'Je cuisine de temps en temps': ['Norm_Nb_Commerces'],
-    'Je cuisine rarement': ['Norm_Nb_Restaurants'],
-    'Je mange beaucoup dehors': ['Norm_Nb_Restaurants', 'Norm_Nb_Bars'],
-
-    # Q7 : Services
-    'Pharmacie': ['Norm_Nb_Pharmacies'],
-    'Commerces / supermarchés': ['Norm_Nb_Commerces'],
-    'Restaurants / cafés': ['Norm_Nb_Restaurants'],
-    'Pas particulièrement': [],
-
-    # Q8 : Enfants
-    'Oui': ['Norm_Nb_Ecoles', 'Norm_Nb_ParcsEnfants', 'Norm_Surface_Verte_m2'],
-    'Pas encore mais bientôt': ['Norm_Nb_Ecoles', 'Norm_Nb_ParcsEnfants'],
-    'Non': [],
-    'Jamais': [],
-
-    # Q9 : Sécurité / Tranquillité
-    'Très important': ['Norm_Bruit', 'Norm_Nb_ParcsEnfants'],
-    'Assez important': ['Norm_Bruit'],
-    'Peu important': [],
-    'Pas vraiment': [],
-
-    # Q10 : Rythme de vie
-    'Plutôt tranquille': ['Norm_Bruit'],
-    'Relax & chill': ['Norm_Nb_Commerces'],
-    'Dynamique': ['Norm_Nb_Restaurants', 'Norm_Nb_Commerces'],
-    'Très actif / je sors souvent': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants'],
-}
+@dataclass
+class ProfilUtilisateur:
+    """Profil créé à partir des réponses du questionnaire (9 questions)"""
+    budget_multiplier: float  # 1.0 à 4.0
+    mobilite_multiplier: float  # 0.5 à 4.0
+    nature_importance: float  # 0.3 à 3.0
+    tranquillite_importance: float  # 0.5 à 3.0
+    vie_nocturne: float  # 0.0 à 2.0
+    famille_boost: float  # 0.0 à 2.5
+    culture_sport: float  # 0.3 à 2.5
+    calme_vs_anime: float  # -2.0 à +2.0
+    communaute: float  # 0.0 à 2.0
+    reponses_texte: dict = field(default_factory=dict)
 
 
 # --------------------------------------------------------------------------
-# --- II. CHARGEMENT SÉCURISÉ DES DONNÉES ---
+# --- CHARGEMENT DES DONNÉES ---
 # --------------------------------------------------------------------------
 
 def charger_matrice():
     """Charge la matrice de données depuis Excel"""
     try:
-        df = pd.read_excel(FICHIER_MATRICE, sheet_name=NOM_FEUILLE)
+        df = pd.read_excel(FICHIER_MATRICE)
         
-        if 'NOM_IRIS' not in df.columns:
-            print("❌ ERREUR : La colonne 'NOM_IRIS' est manquante.")
-            return None
-        
-        if df.empty:
-            print("❌ ERREUR : La feuille Excel est vide.")
-            return None
-        
-        # Nettoyage
-        cols_norm = [col for col in df.columns if col.startswith('Norm_')]
-        df[cols_norm] = df[cols_norm].fillna(0.0)
-        
-        print(f"✅ Matrice chargée avec {df.shape[0]} lignes.")
+        print(f"✅ Matrice chargée avec {len(df)} lignes")
         return df
         
     except Exception as e:
@@ -117,83 +64,358 @@ def charger_matrice():
 
 
 # --------------------------------------------------------------------------
-# --- III. FONCTIONS DE SCORING ---
+# --- FONCTIONS DE NORMALISATION ---
 # --------------------------------------------------------------------------
 
-def consolider_poids_utilisateur(reponses_dict):
-    """
-    Traduit les réponses utilisateur en poids pour chaque critère.
-    reponses_dict: {0: {'option': 'Paisible & proche de la nature', 'poids': 1}, ...}
-    Le poids (1-4) représente le niveau d'intérêt de l'utilisateur.
-    """
-    poids_finaux = {col: 0 for col in TOUS_LES_CRITERES_NORMALISES}
+def _normaliser_score(valeurs: pd.Series, inverse: bool = False) -> pd.Series:
+    """Normalise un score entre 0 et 100 avec distribution non-linéaire"""
+    if valeurs.std() == 0:
+        return pd.Series([50] * len(valeurs), index=valeurs.index)
     
-    for question_idx, reponse_data in reponses_dict.items():
-        # Extraire l'option et le niveau d'intérêt (poids du bouton)
-        if isinstance(reponse_data, dict):
-            option_choisie = reponse_data.get('option', '')
-            niveau_interet = reponse_data.get('poids', 0)  # 1=😤, 2=😕, 3=😊, 4=🤩
-        else:
-            continue
-        
-        if niveau_interet == 0:
-            continue
-        
-        # Le poids à ajouter est directement le niveau d'intérêt du bouton
-        poids_a_ajouter = niveau_interet
-        
-        # Logique spécifique pour Q5 (Budget)
-        # L'algorithme original applique le niveau d'intérêt différemment pour le budget
-        # Serré + Très intéressé = poids maximal, etc.
-        # MAIS on ne change PAS le poids ici, on le garde tel quel
-        # La seule exception est si l'option est "Flexible" -> poids = 0
-        if 'Flexible' in option_choisie:
-            poids_a_ajouter = 0
-        
-        # Récupérer les critères à renforcer pour cette option
-        if option_choisie and option_choisie in LOGIQUE_SCORING:
-            criteres_renforces = LOGIQUE_SCORING[option_choisie]
-            
-            for critere in criteres_renforces:
-                if critere in poids_finaux:
-                    poids_finaux[critere] += poids_a_ajouter
+    # Normalisation robuste
+    q1 = valeurs.quantile(0.25)
+    q3 = valeurs.quantile(0.75)
+    iqr = q3 - q1
     
-    return poids_finaux
+    if iqr == 0:
+        normalized = (valeurs - valeurs.min()) / (valeurs.max() - valeurs.min() + 1e-10)
+    else:
+        normalized = (valeurs - q1) / (iqr * 1.5)
+        normalized = normalized.clip(0, 1)
+    
+    if inverse:
+        normalized = 1 - normalized
+    
+    # Application fonction sigmoïde
+    sigmoid_normalized = 100 / (1 + np.exp(-6 * (normalized - 0.5)))
+    
+    return sigmoid_normalized
 
 
-def recommander_quartiers(poids_finaux_consolides, matrice_data, n_recommandations=5):
+# --------------------------------------------------------------------------
+# --- CALCUL DES SCORES PAR CRITÈRE ---
+# --------------------------------------------------------------------------
+
+def _calculer_score_prix(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
+    """Score basé sur le prix RÉEL avec bonus quartiers abordables"""
+    prix_m2 = iris_data['Prix_Median_m2']
+    score_base = _normaliser_score(prix_m2, inverse=True)
+    
+    # Bonus quartiers abordables
+    bonus_abordable = pd.Series(0.0, index=score_base.index)
+    if profil.budget_multiplier >= 2.5:
+        quartiers_abordables = prix_m2 < 2500
+        bonus_valeur = (2500 - prix_m2[quartiers_abordables]) / 2500 * 40
+        bonus_abordable[quartiers_abordables] = bonus_valeur
+    
+    return (score_base + bonus_abordable) * profil.budget_multiplier
+
+
+def _calculer_score_espaces_verts(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
+    """Score espaces verts"""
+    surface_verts = iris_data['Surface_Verte_m2']
+    scores = _normaliser_score(surface_verts)
+    return scores * profil.nature_importance
+
+
+def _calculer_score_transports(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
+    """Score transports basé sur Nb_Transports"""
+    nb_transports = iris_data['Nb_Transports']
+    score = _normaliser_score(nb_transports)
+    return score * profil.mobilite_multiplier
+
+
+def _calculer_score_tranquillite(iris_data: pd.DataFrame, iris_data_raw: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
+    """Score tranquillité basé sur NORM_BRUIT"""
+    # Moins de bruit = plus tranquille
+    score_base = 100 - (iris_data_raw['Norm_Bruit'] * 100)
+    
+    # Bonus quartiers très calmes
+    bonus_calme = pd.Series(0.0, index=score_base.index)
+    if profil.tranquillite_importance >= 2.0:
+        bruit_db = iris_data_raw['Bruit_Leq_dB']
+        quartiers_calmes = bruit_db < 60
+        bonus_valeur = (60 - bruit_db[quartiers_calmes]) / 60 * 30
+        bonus_calme[quartiers_calmes] = bonus_valeur
+    
+    return (score_base + bonus_calme) * profil.tranquillite_importance
+
+
+def _calculer_score_commerces(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
+    """Score commerces/commodités"""
+    score = (
+        iris_data['Nb_Commerces'] * 3 +
+        iris_data['Nb_Pharmacies'] * 5 +
+        iris_data['Nb_Restaurants'] * 2
+    )
+    normalized = _normaliser_score(score)
+    
+    score_final = normalized
+    if profil.vie_nocturne > 1.0:
+        score_final *= 1.2
+    
+    return score_final
+
+
+def _calculer_score_culture(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
+    """Score culture basé sur Nb_Bars"""
+    score = iris_data['Nb_Bars']
+    normalized = _normaliser_score(score)
+    return normalized
+
+
+def _calculer_score_sport(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
+    """Score sport basé sur Nb_ComplexesSportifs"""
+    score = iris_data['Nb_ComplexesSportifs']
+    normalized = _normaliser_score(score)
+    return normalized * profil.culture_sport
+
+
+# --------------------------------------------------------------------------
+# --- BONUS ---
+# --------------------------------------------------------------------------
+
+def _calculer_bonus_familial(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
+    """Bonus quartier familial"""
+    bonus = pd.Series(0.0, index=iris_data.index)
+    
+    if profil.famille_boost >= 1.5:
+        nb_ecoles = iris_data['Nb_Ecoles']
+        iris_educatifs = nb_ecoles >= 3
+        bonus[iris_educatifs] = (nb_ecoles[iris_educatifs] - 2) * 15
+    
+    return bonus
+
+
+def _calculer_bonus_equilibre(iris_data: pd.DataFrame, iris_data_raw: pd.DataFrame) -> pd.Series:
+    """Bonus équilibre pour quartiers corrects sur plusieurs critères"""
+    bonus = pd.Series(0.0, index=iris_data.index)
+    
+    nb_criteres_ok = pd.Series(0, index=iris_data.index)
+    nb_criteres_ok += (iris_data['Prix_Median_m2'] < 2800).astype(int)
+    nb_criteres_ok += (iris_data['Surface_Verte_m2'] > 5000).astype(int)
+    nb_criteres_ok += (iris_data['Nb_Transports'] > 2).astype(int)
+    nb_criteres_ok += (iris_data['Nb_Commerces'] > 5).astype(int)
+    nb_criteres_ok += (iris_data_raw['Bruit_Leq_dB'] < 70).astype(int)
+    
+    bonus[nb_criteres_ok == 2] = 10
+    bonus[nb_criteres_ok == 3] = 20
+    bonus[nb_criteres_ok >= 4] = 35
+    
+    return bonus
+
+
+def _appliquer_antimonopole(scores: pd.Series) -> pd.Series:
+    """Système anti-monopole : pénalisation progressive des superstars"""
+    moyenne = scores.mean()
+    ecart_type = scores.std()
+    seuil = moyenne + 0.85 * ecart_type
+    
+    scores_penalises = scores.copy()
+    
+    for idx in scores.index:
+        if scores[idx] > seuil:
+            exces = scores[idx] - seuil
+            penalite = exces * 0.35 + math.log(1 + exces) * 12
+            scores_penalises[idx] = scores[idx] - penalite
+    
+    return scores_penalises
+
+
+# --------------------------------------------------------------------------
+# --- FONCTION PRINCIPALE DE CALCUL ---
+# --------------------------------------------------------------------------
+
+def calculer_scores_complets(profil: ProfilUtilisateur, iris_data: pd.DataFrame, iris_data_raw: pd.DataFrame) -> pd.DataFrame:
+    """Calcule les scores complets pour tous les IRIS"""
+    
+    resultats = pd.DataFrame()
+    resultats['code_iris'] = iris_data['CODE_IRIS'].astype(str)
+    
+    # Calculer chaque critère
+    resultats['score_prix'] = _calculer_score_prix(iris_data, profil)
+    resultats['score_espaces_verts'] = _calculer_score_espaces_verts(iris_data, profil)
+    resultats['score_transports'] = _calculer_score_transports(iris_data, profil)
+    resultats['score_tranquillite'] = _calculer_score_tranquillite(iris_data, iris_data_raw, profil)
+    resultats['score_commerces'] = _calculer_score_commerces(iris_data, profil)
+    resultats['score_culture'] = _calculer_score_culture(iris_data, profil)
+    resultats['score_sport'] = _calculer_score_sport(iris_data, profil)
+    
+    # Score total pondéré
+    poids = CriterePonderation
+    resultats['score_total'] = (
+        resultats['score_prix'] * poids.PRIX +
+        resultats['score_transports'] * poids.TRANSPORTS +
+        resultats['score_espaces_verts'] * poids.ESPACES_VERTS +
+        resultats['score_tranquillite'] * poids.SECURITE +
+        resultats['score_commerces'] * poids.COMMERCES +
+        resultats['score_culture'] * poids.CULTURE +
+        resultats['score_sport'] * poids.SPORT
+    ) / (poids.PRIX + poids.TRANSPORTS + poids.ESPACES_VERTS + 
+         poids.SECURITE + poids.COMMERCES + poids.CULTURE + poids.SPORT)
+    
+    # Bonus ciblés
+    bonus_familial = _calculer_bonus_familial(iris_data, profil)
+    bonus_equilibre = _calculer_bonus_equilibre(iris_data, iris_data_raw)
+    
+    resultats['score_total'] = resultats['score_total'] + bonus_familial + bonus_equilibre
+    
+    # Anti-monopole
+    resultats['score_total'] = _appliquer_antimonopole(resultats['score_total'])
+    
+    # Classer
+    resultats = resultats.sort_values('score_total', ascending=False).reset_index(drop=True)
+    resultats['rang'] = range(1, len(resultats) + 1)
+    
+    return resultats
+
+
+# --------------------------------------------------------------------------
+# --- FONCTION DE CONVERSION DEPUIS RÉPONSES ---
+# --------------------------------------------------------------------------
+
+def creer_profil_depuis_reponses(reponses_dict: Dict) -> ProfilUtilisateur:
     """
-    Calcule les scores de correspondance et retourne les meilleurs quartiers.
+    Crée un ProfilUtilisateur à partir des réponses du questionnaire.
+    
+    reponses_dict structure:
+    {
+        0: {'option': 'Très limité', 'poids': 4},  # Q1: Budget
+        1: {'option': 'Transports publics', 'poids': 4},  # Q2: Mobilité
+        ...
+    }
+    """
+    
+    # Mappings des réponses vers les valeurs du profil
+    budget_map = {
+        'Très limité': 4.0,
+        'Modéré': 2.5,
+        'Confortable': 1.5,
+        'Élevé': 1.0
+    }
+    
+    mobilite_map = {
+        'Voiture': 0.5,
+        'Transports publics': 4.0,
+        'Vélo': 2.0,
+        'À pied': 1.5
+    }
+    
+    nature_map = {
+        'Essentiel': 3.0,
+        'Important': 2.0,
+        'Secondaire': 1.0,
+        'Indifférent': 0.3
+    }
+    
+    tranquillite_map = {
+        'Primordial': 3.0,
+        'Important': 2.0,
+        'Normal': 1.0,
+        'Peu important': 0.5
+    }
+    
+    vie_map = {
+        'Très important': 2.0,
+        'Occasionnellement': 1.0,
+        'Rarement': 0.3,
+        'Jamais': 0.0
+    }
+    
+    famille_map = {
+        'Célibataire': 0.0,
+        'Couple sans enfant': 0.5,
+        'Jeune famille': 2.0,
+        'Famille nombreuse': 2.5
+    }
+    
+    sport_map = {
+        'Très actif': 2.5,
+        'Occasionnellement': 1.5,
+        'Rarement': 0.8,
+        'Jamais': 0.3
+    }
+    
+    ambiance_map = {
+        'Très calme': -2.0,
+        'Calme mais vivant': -0.5,
+        'Animé': 1.0,
+        'Très animé': 2.0
+    }
+    
+    # Extraire les valeurs (avec defaults)
+    r1 = reponses_dict.get(0, {}).get('option', 'Modéré')
+    r2 = reponses_dict.get(1, {}).get('option', 'Vélo')
+    r3 = reponses_dict.get(2, {}).get('option', 'Important')
+    r4 = reponses_dict.get(3, {}).get('option', 'Important')
+    r6 = reponses_dict.get(5, {}).get('option', 'Occasionnellement')
+    r7 = reponses_dict.get(6, {}).get('option', 'Couple sans enfant')
+    r8 = reponses_dict.get(7, {}).get('option', 'Occasionnellement')
+    r9 = reponses_dict.get(8, {}).get('option', 'Calme mais vivant')
+    
+    budget_val = budget_map.get(r1, 2.5)
+    mobilite_val = mobilite_map.get(r2, 2.0)
+    nature_val = nature_map.get(r3, 2.0)
+    tranquillite_val = tranquillite_map.get(r4, 2.0)
+    vie_val = vie_map.get(r6, 1.0)
+    famille_val = famille_map.get(r7, 0.5)
+    sport_val = sport_map.get(r8, 1.5)
+    calme_val = ambiance_map.get(r9, 0.0)
+    
+    profil = ProfilUtilisateur(
+        budget_multiplier=budget_val,
+        mobilite_multiplier=mobilite_val,
+        nature_importance=nature_val,
+        tranquillite_importance=tranquillite_val,
+        vie_nocturne=vie_val,
+        famille_boost=famille_val,
+        culture_sport=sport_val,
+        calme_vs_anime=calme_val,
+        communaute=famille_val * 0.5,
+        reponses_texte={
+            'Q1_Budget': r1,
+            'Q2_Mobilité': r2,
+            'Q3_Espaces_verts': r3,
+            'Q4_Tranquillité': r4,
+            'Q6_Vie_nocturne': r6,
+            'Q7_Famille': r7,
+            'Q8_Sport': r8,
+            'Q9_Ambiance': r9
+        }
+    )
+    
+    return profil
+
+
+# --------------------------------------------------------------------------
+# --- FONCTION COMPATIBLE AVEC APP.PY ---
+# --------------------------------------------------------------------------
+
+def recommander_quartiers(reponses_dict: Dict, matrice_data: pd.DataFrame, n_recommandations: int = 110):
+    """
+    Fonction compatible avec l'interface Streamlit existante.
+    Retourne les résultats sous forme de DataFrame.
     """
     if matrice_data is None or matrice_data.empty:
         return None
     
-    df_reco = matrice_data.copy()
-    df_reco['Score_Correspondance_Total'] = 0.0
-    total_poids_valides = sum(poids_finaux_consolides.values())
+    # Créer le profil
+    profil = creer_profil_depuis_reponses(reponses_dict)
     
-    if total_poids_valides == 0:
-        return None
+    # Calculer les scores
+    resultats = calculer_scores_complets(profil, matrice_data, matrice_data)
     
-    # Calcul de la Somme Pondérée
-    for col_norm, poids in poids_finaux_consolides.items():
-        if col_norm in df_reco.columns and poids > 0:
-            df_reco['Score_Correspondance_Total'] += df_reco[col_norm] * poids
+    # Ajouter le nom IRIS pour compatibilité
+    if 'NOM_IRIS' in matrice_data.columns:
+        code_to_nom = dict(zip(matrice_data['CODE_IRIS'].astype(str), matrice_data['NOM_IRIS']))
+        resultats['NOM_IRIS'] = resultats['code_iris'].map(code_to_nom)
     
-    # Normalisation sur 100
-    df_reco['Score_Final_100'] = (df_reco['Score_Correspondance_Total'] / total_poids_valides) * 100
+    # Renommer pour compatibilité
+    resultats = resultats.rename(columns={'score_total': 'Score_Max'})
     
-    # Regroupement et Classement
-    recommendations = (
-        df_reco.groupby('NOM_IRIS')
-        .agg(
-            Score_Max=('Score_Final_100', 'max'),
-            Prix_Median_m2=('Prix_Median_m2', 'mean') if 'Prix_Median_m2' in df_reco.columns else ('Score_Final_100', 'count'),
-            IRIS_Meilleur=('CODE_IRIS', lambda x: df_reco.loc[df_reco.loc[x.index, 'Score_Final_100'].idxmax(), 'CODE_IRIS'] if 'CODE_IRIS' in df_reco.columns else x.iloc[0])
-        )
-        .sort_values(by='Score_Max', ascending=False)
-        .head(n_recommandations)
-        .reset_index()
-    )
-    
-    return recommendations
+    return resultats.head(n_recommandations)
+
+
+def consolider_poids_utilisateur(reponses_dict: Dict) -> Dict:
+    """Fonction de compatibilité (non utilisée dans le nouveau système)"""
+    return {}
