@@ -1,6 +1,6 @@
 """
-Algorithme de Recommandation d'IRIS - Métropole de Lille (VERSION CORRIGÉE)
-============================================================================
+Algorithme de Recommandation d'IRIS - Métropole de Lille (VERSION CORRIGÉE v2)
+===============================================================================
 
 Utilise UNIQUEMENT les vraies données du fichier Excel, sans invention.
 Système de scoring multi-critères avec anti-monopole pour garantir équité.
@@ -21,19 +21,19 @@ FICHIER_MATRICE = 'DATASET scores brut.xlsx'
 
 
 class CriterePonderation:
-    """Définit l'importance relative des différents critères (ULTRA-RÉÉQUILIBRÉ v3+)"""
-    PRIX = 1.0
-    TRANSPORTS = 2.0
+    """Définit l'importance relative des différents critères"""
+    PRIX = 1.8  # Augmenté car critère décisif
+    TRANSPORTS = 2.5  # Essentiel mobilité quotidienne
     ESPACES_VERTS = 1.5
-    SECURITE = 2.0
-    COMMERCES = 1.5
-    CULTURE = 1.5
+    SECURITE = 2.8  # Prioritaire : qualité de vie
+    COMMERCES = 2.2  # Augmenté : commodités quotidiennes
+    CULTURE = 1.3  # Bars : moins prioritaire
     SPORT = 1.0
 
 
 @dataclass
 class ProfilUtilisateur:
-    """Profil créé à partir des réponses du questionnaire"""
+    """Profil créé à partir des réponses du questionnaire (9 questions)"""
     budget_multiplier: float  # 1.0 à 4.0
     mobilite_multiplier: float  # 0.5 à 4.0
     nature_importance: float  # 0.3 à 3.0
@@ -54,8 +54,10 @@ def charger_matrice():
     """Charge la matrice de données depuis Excel"""
     try:
         df = pd.read_excel(FICHIER_MATRICE)
+        
         print(f"✅ Matrice chargée avec {len(df)} lignes")
         return df
+        
     except Exception as e:
         print(f"❌ ERREUR lors du chargement : {e}")
         return None
@@ -113,6 +115,7 @@ def _calculer_score_prix(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> 
         return (score_base + bonus_abordable).clip(upper=100)
     else:
         # Budget confortable/élevé : score neutre ou favorable aux prix élevés
+        # On normalise sans inverser (prix élevés = score élevé)
         score_base = _normaliser_score(prix_m2, inverse=False)
         return (score_base * (profil.budget_multiplier / 2.0)).clip(upper=100)
 
@@ -143,6 +146,7 @@ def _calculer_score_tranquillite(iris_data: pd.DataFrame, iris_data_raw: pd.Data
     if 'Norm_Bruit' in iris_data_raw.columns:
         score_base = 100 - (iris_data_raw['Norm_Bruit'] * 100)
     else:
+        # Fallback si colonne manquante
         score_base = pd.Series(50.0, index=iris_data.index)
     
     # Bonus/malus selon préférence calme vs animé
@@ -280,6 +284,7 @@ def calculer_scores_complets(profil: ProfilUtilisateur, iris_data: pd.DataFrame,
     elif 'code_iris' in iris_data.columns:
         resultats['code_iris'] = iris_data['code_iris'].astype(str)
     else:
+        # Fallback: créer des codes factices
         resultats['code_iris'] = [f'IRIS_{i}' for i in range(len(iris_data))]
     
     # Calculer chaque critère
@@ -310,7 +315,7 @@ def calculer_scores_complets(profil: ProfilUtilisateur, iris_data: pd.DataFrame,
     
     resultats['score_total'] = resultats['score_total'] + bonus_familial + bonus_equilibre
     
-    # Appliquer anti-monopole
+    # Anti-monopole
     resultats['score_total'] = _appliquer_antimonopole(resultats['score_total'])
     
     # Classer
@@ -325,7 +330,16 @@ def calculer_scores_complets(profil: ProfilUtilisateur, iris_data: pd.DataFrame,
 # --------------------------------------------------------------------------
 
 def creer_profil_depuis_reponses(reponses_dict: Dict) -> ProfilUtilisateur:
-    """Crée un ProfilUtilisateur à partir des réponses du questionnaire"""
+    """
+    Crée un ProfilUtilisateur à partir des réponses du questionnaire.
+    
+    reponses_dict structure:
+    {
+        0: {'option': 'Très limité', 'poids': 4},  # Q1: Budget
+        1: {'option': 'Transports publics', 'poids': 4},  # Q2: Mobilité
+        ...
+    }
+    """
     
     # Mappings des réponses vers les valeurs du profil
     budget_map = {
@@ -403,7 +417,7 @@ def creer_profil_depuis_reponses(reponses_dict: Dict) -> ProfilUtilisateur:
     sport_val = sport_map.get(r8, 1.5)
     calme_val = ambiance_map.get(r9, 0.0)
     
-    return ProfilUtilisateur(
+    profil = ProfilUtilisateur(
         budget_multiplier=budget_val,
         mobilite_multiplier=mobilite_val,
         nature_importance=nature_val,
@@ -413,32 +427,50 @@ def creer_profil_depuis_reponses(reponses_dict: Dict) -> ProfilUtilisateur:
         culture_sport=sport_val,
         calme_vs_anime=calme_val,
         communaute=famille_val * 0.5,
-        reponses_texte={}
+        reponses_texte={
+            'Q1_Budget': r1,
+            'Q2_Mobilité': r2,
+            'Q3_Espaces_verts': r3,
+            'Q4_Tranquillité': r4,
+            'Q6_Vie_nocturne': r6,
+            'Q7_Famille': r7,
+            'Q8_Sport': r8,
+            'Q9_Ambiance': r9
+        }
     )
+    
+    return profil
 
 
-def recommander_quartiers(reponses_utilisateur: Dict, iris_data_raw: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
-    """Fonction wrapper compatible avec l'interface Streamlit"""
+# --------------------------------------------------------------------------
+# --- FONCTION COMPATIBLE AVEC APP.PY ---
+# --------------------------------------------------------------------------
+
+def recommander_quartiers(reponses_dict: Dict, matrice_data: pd.DataFrame, n_recommandations: int = 110):
+    """
+    Fonction compatible avec l'interface Streamlit existante.
+    Retourne les résultats sous forme de DataFrame.
+    """
+    if matrice_data is None or matrice_data.empty:
+        return None
     
     # Créer le profil
-    profil = creer_profil_depuis_reponses(reponses_utilisateur)
+    profil = creer_profil_depuis_reponses(reponses_dict)
     
     # Calculer les scores
-    resultats = calculer_scores_complets(profil, iris_data_raw, iris_data_raw)
+    resultats = calculer_scores_complets(profil, matrice_data, matrice_data)
     
-    # Retourner le top N avec le format attendu par Streamlit
-    top_resultats = resultats.head(top_n).copy()
-    
-    # Ajouter la colonne NOM_IRIS si elle existe dans les données brutes
-    if 'NOM_IRIS' in iris_data_raw.columns:
-        top_resultats = top_resultats.merge(
-            iris_data_raw[['CODE_IRIS', 'NOM_IRIS']].drop_duplicates(),
-            left_on='code_iris',
-            right_on='CODE_IRIS',
-            how='left'
-        )
+    # Ajouter le nom IRIS pour compatibilité
+    if 'NOM_IRIS' in matrice_data.columns:
+        code_to_nom = dict(zip(matrice_data['CODE_IRIS'].astype(str), matrice_data['NOM_IRIS']))
+        resultats['NOM_IRIS'] = resultats['code_iris'].map(code_to_nom)
     
     # Renommer pour compatibilité
-    top_resultats['Score_Max'] = top_resultats['score_total']
+    resultats = resultats.rename(columns={'score_total': 'Score_Max'})
     
-    return top_resultats
+    return resultats.head(n_recommandations)
+
+
+def consolider_poids_utilisateur(reponses_dict: Dict) -> Dict:
+    """Fonction de compatibilité (non utilisée dans le nouveau système)"""
+    return {}
