@@ -1324,8 +1324,8 @@ else:
                     st.progress(score_commerces / 100)
                     st.caption(f"{score_commerces:.0f}/100")
                     
-                    # Culture
-                    st.markdown("🎭 **Culture**")
+                    # Bars
+                    st.markdown("🍺 **Bars**")
                     st.progress(score_culture / 100)
                     st.caption(f"{score_culture:.0f}/100")
                     

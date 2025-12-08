@@ -97,32 +97,41 @@ def _normaliser_score(valeurs: pd.Series, inverse: bool = False) -> pd.Series:
 # --------------------------------------------------------------------------
 
 def _calculer_score_prix(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
-    """Score basé sur le prix RÉEL avec bonus quartiers abordables"""
+    """Score basé sur le prix RÉEL adapté au budget de l'utilisateur"""
     prix_m2 = iris_data['Prix_Median_m2']
-    score_base = _normaliser_score(prix_m2, inverse=True)
     
-    # Bonus quartiers abordables
-    bonus_abordable = pd.Series(0.0, index=score_base.index)
-    if profil.budget_multiplier >= 2.5:
+    # Si budget limité (1.0-2.0) : on préfère les quartiers bon marché (inverse=True)
+    # Si budget élevé (2.5-4.0) : on accepte/préfère les quartiers plus chers (inverse=False)
+    if profil.budget_multiplier < 2.0:
+        # Budget limité : score élevé pour prix bas
+        score_base = _normaliser_score(prix_m2, inverse=True)
+        
+        # Bonus pour quartiers très abordables
+        bonus_abordable = pd.Series(0.0, index=score_base.index)
         quartiers_abordables = prix_m2 < 2500
         bonus_valeur = (2500 - prix_m2[quartiers_abordables]) / 2500 * 40
         bonus_abordable[quartiers_abordables] = bonus_valeur
-    
-    return (score_base + bonus_abordable) * profil.budget_multiplier
+        
+        return (score_base + bonus_abordable).clip(upper=100)
+    else:
+        # Budget confortable/élevé : score neutre ou favorable aux prix élevés
+        # On normalise sans inverser (prix élevés = score élevé)
+        score_base = _normaliser_score(prix_m2, inverse=False)
+        return (score_base * (profil.budget_multiplier / 2.0)).clip(upper=100)
 
 
 def _calculer_score_espaces_verts(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
     """Score espaces verts"""
     surface_verts = iris_data['Surface_Verte_m2']
     scores = _normaliser_score(surface_verts)
-    return scores * profil.nature_importance
+    return (scores * profil.nature_importance).clip(upper=100)
 
 
 def _calculer_score_transports(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
     """Score transports basé sur Nb_Transports"""
     nb_transports = iris_data['Nb_Transports']
     score = _normaliser_score(nb_transports)
-    return score * profil.mobilite_multiplier
+    return (score * profil.mobilite_multiplier).clip(upper=100)
 
 
 def _calculer_score_tranquillite(iris_data: pd.DataFrame, iris_data_raw: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
@@ -142,7 +151,7 @@ def _calculer_score_tranquillite(iris_data: pd.DataFrame, iris_data_raw: pd.Data
         bonus_valeur = (60 - bruit_db[quartiers_calmes]) / 60 * 30
         bonus_calme[quartiers_calmes] = bonus_valeur
     
-    return (score_base + bonus_calme) * profil.tranquillite_importance
+    return ((score_base + bonus_calme) * profil.tranquillite_importance).clip(upper=100)
 
 
 def _calculer_score_commerces(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
@@ -158,21 +167,21 @@ def _calculer_score_commerces(iris_data: pd.DataFrame, profil: ProfilUtilisateur
     if profil.vie_nocturne > 1.0:
         score_final *= 1.2
     
-    return score_final
+    return score_final.clip(upper=100)
 
 
 def _calculer_score_culture(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
     """Score culture basé sur Nb_Bars"""
     score = iris_data['Nb_Bars']
     normalized = _normaliser_score(score)
-    return normalized
+    return normalized.clip(upper=100)
 
 
 def _calculer_score_sport(iris_data: pd.DataFrame, profil: ProfilUtilisateur) -> pd.Series:
     """Score sport basé sur Nb_ComplexesSportifs"""
     score = iris_data['Nb_ComplexesSportifs']
     normalized = _normaliser_score(score)
-    return normalized * profil.culture_sport
+    return (normalized * profil.culture_sport).clip(upper=100)
 
 
 # --------------------------------------------------------------------------
@@ -306,10 +315,10 @@ def creer_profil_depuis_reponses(reponses_dict: Dict) -> ProfilUtilisateur:
     
     # Mappings des réponses vers les valeurs du profil
     budget_map = {
-        'Très limité': 4.0,
-        'Modéré': 2.5,
-        'Confortable': 1.5,
-        'Élevé': 1.0
+        'Très limité': 1.0,
+        'Modéré': 1.5,
+        'Confortable': 2.5,
+        'Élevé': 4.0
     }
     
     mobilite_map = {
