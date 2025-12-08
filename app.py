@@ -1249,13 +1249,70 @@ else:
         nom_iris = st.session_state.selected_quartier
 
         st.markdown("---")
-        col_title, col_close = st.columns([4, 1])
-        with col_title:
-            st.markdown(f"### 🏠 Offres disponibles — {nom_iris}")
-        with col_close:
-            if st.button("✖️ Fermer", key="close_listings"):
-                st.session_state.selected_quartier = None
-                st.rerun()
+        st.markdown(f"### 🏠 Offres disponibles — {nom_iris}")
+        
+        # Afficher l'explication du score si disponible
+        if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty:
+            quartier_data = st.session_state.tous_scores[st.session_state.tous_scores['NOM_IRIS'] == nom_iris]
+            if not quartier_data.empty:
+                score = quartier_data.iloc[0]['Score_Max']
+                
+                # Calculer les détails du scoring
+                if st.session_state.matrice_data is not None:
+                    from scoring_logic import consolider_poids_utilisateur
+                    poids = consolider_poids_utilisateur(st.session_state.reponses)
+                    
+                    # Trouver la ligne correspondante dans la matrice
+                    quartier_row = st.session_state.matrice_data[st.session_state.matrice_data['NOM_IRIS'] == nom_iris]
+                    if not quartier_row.empty:
+                        # Calculer la contribution de chaque critère
+                        contributions = {}
+                        total_poids = sum(poids.values())
+                        
+                        for critere, poids_critere in poids.items():
+                            if poids_critere > 0 and critere in quartier_row.columns:
+                                valeur_normalisee = quartier_row.iloc[0][critere]
+                                contribution = (valeur_normalisee * poids_critere / total_poids) * 100
+                                # Traduire le nom du critère en français
+                                nom_francais = critere.replace('Norm_', '').replace('_', ' ')
+                                contributions[nom_francais] = contribution
+                        
+                        # Afficher l'explication du score
+                        score_color = "#10b981" if score > 60 else "#ff5a5f" if score < 40 else "#fbbf24"
+                        st.markdown(
+                            f"""
+                            <div style="background: white; padding: 16px; border-radius: 12px; margin-bottom: 16px; border-left: 4px solid {score_color};">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <h4 style="margin: 0; color: #121212;">💯 Score de compatibilité</h4>
+                                    <div style="font-size: 24px; font-weight: bold; color: {score_color};">{score:.0f}/100</div>
+                                </div>
+                                <p style="color: #6c6c6c; font-size: 14px; margin: 0;">Ce score est calculé en fonction de vos préférences. Voici comment il se décompose :</p>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                        
+                        # Afficher les top 5 critères les plus importants
+                        if contributions:
+                            top_contributions = sorted(contributions.items(), key=lambda x: x[1], reverse=True)[:5]
+                            st.markdown("**🎯 Principaux facteurs influençant ce score :**")
+                            for nom_critere, contribution in top_contributions:
+                                bar_width = min(contribution, 100)  # Cap à 100%
+                                st.markdown(
+                                    f"""
+                                    <div style="margin-bottom: 8px;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                                            <span style="color: #121212;">{nom_critere}</span>
+                                            <span style="color: #6c6c6c;">{contribution:.1f} pts</span>
+                                        </div>
+                                        <div style="background: #f3f4f6; height: 6px; border-radius: 3px; overflow: hidden;">
+                                            <div style="background: {score_color}; height: 100%; width: {bar_width}%; transition: width 0.3s ease;"></div>
+                                        </div>
+                                    </div>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
+                            st.markdown("---")
 
         # Scraper les annonces réelles
         with st.spinner("Chargement des offres..."):
