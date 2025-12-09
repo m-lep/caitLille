@@ -1315,8 +1315,12 @@ else:
                         # Gérer les deux formats de colonnes
                         score_col = 'Score_Max' if 'Score_Max' in quartier_data.columns else 'Score_Final_100'
                         score = quartier_data.iloc[0][score_col]
+                        # Calculer min/max pour normalisation (comme pour la carte)
+                        all_scores_values = st.session_state.tous_scores[score_col].values
+                        min_score_value = min(all_scores_values)
+                        max_score_value = max(all_scores_values)
                         # Utiliser la même fonction get_color_from_score que pour la carte
-                        score_color = get_color_from_score(score)
+                        score_color = get_color_from_score(score, min_score_value, max_score_value)
                 
                 # Afficher uniquement le nom du quartier avec bordure colorée
                 st.markdown(
