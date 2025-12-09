@@ -148,9 +148,9 @@ def consolider_poids_utilisateur(reponses_dict):
             
             for idx, critere in enumerate(criteres_renforces):
                 if critere in poids_finaux:
-                    # Pour le budget, SEUL le critère Norm_Prix reçoit le boost ×3
+                    # Pour le budget, SEUL le critère Norm_Prix reçoit le boost ×4
                     if is_budget and critere == 'Norm_Prix':
-                        poids_finaux[critere] += niveau_interet * 3
+                        poids_finaux[critere] += niveau_interet * 4
                     # Les autres critères reçoivent le poids normal
                     else:
                         poids_finaux[critere] += niveau_interet

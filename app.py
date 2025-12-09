@@ -1296,16 +1296,16 @@ else:
                     total_poids = sum(poids.values())
                     
                     if total_poids > 0:
-                        # Récupérer TOUS les critères (pas seulement ceux avec poids > 0)
+                        # Récupérer SEULEMENT les critères que l'utilisateur a sélectionnés (poids > 0)
                         criteres_importants = []
                         # Trouver le poids max pour normaliser
                         poids_max = max(poids.values()) if poids.values() else 1
                         
                         for critere, poids_critere in poids.items():
-                            if critere in quartier_row.columns:
+                            if poids_critere > 0 and critere in quartier_row.columns:
                                 valeur_zone = quartier_row.iloc[0][critere] * 100
                                 # Normaliser le poids sur 100 (0 = pas important, 100 = très important)
-                                importance = (poids_critere / poids_max) * 100 if poids_critere > 0 else 0
+                                importance = (poids_critere / poids_max) * 100
                                 nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
                                 criteres_importants.append({
                                     'nom': nom_francais,
@@ -1318,8 +1318,14 @@ else:
                         # Trier par poids brut décroissant (critères les plus importants en premier)
                         criteres_importants.sort(key=lambda x: x['poids_brut'], reverse=True)
                         
-                        # Afficher le graphique de comparaison (seulement top 10 pour ne pas surcharger)
-                        for critere in criteres_importants[:10]:
+                        # Afficher détails budget si c'est un critère important
+                        if any(c['nom'] == '💰 Prix abordable' for c in criteres_importants):
+                            prix_median = quartier_row.iloc[0].get('Prix_Median_m2', None)
+                            if prix_median and prix_median > 0:
+                                st.info(f"💰 **Prix médian** : {prix_median:.0f}€/m² dans ce quartier")
+                        
+                        # Afficher le graphique de comparaison pour TOUS les critères importants
+                        for critere in criteres_importants:
                             if critere['ecart'] > 20:
                                 match_color = "#10b981"
                                 match_text = "✅ Excellent"
