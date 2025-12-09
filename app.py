@@ -1455,64 +1455,28 @@ else:
                         
                         # Afficher le graphique de comparaison pour TOUS les critères importants
                         for critere in criteres_importants:
-                            # Pour le prix, la logique est inversée :
-                            # Norm_Prix élevé = pas cher (bon pour budget serré)
-                            # Donc si zone a Norm_Prix élevé ET tu veux budget serré → VERT
-                            is_prix = critere['nom'] == '💰 Prix abordable'
-                            
-                            if is_prix:
-                                # Pour le prix : plus la zone est ÉLEVÉE (pas chère), mieux c'est
-                                # On compare directement les valeurs
-                                if critere['zone'] > 70:  # Zone très abordable
-                                    match_color = "#10b981"
-                                    match_text = "✅ Très abordable"
-                                elif critere['zone'] > 50:  # Zone abordable
-                                    match_color = "#84cc16"
-                                    match_text = "✓ Abordable"
-                                elif critere['zone'] > 30:  # Zone un peu chère
-                                    match_color = "#fbbf24"
-                                    match_text = "~ Prix moyen"
-                                else:  # Zone très chère
-                                    match_color = "#ff5a5f"
-                                    match_text = "✗ Cher"
-                            else:
-                                # Pour les autres critères : logique normale
-                                if critere['ecart'] > 20:
-                                    match_color = "#10b981"
-                                    match_text = "✅ Excellent"
-                                elif critere['ecart'] > 0:
-                                    match_color = "#84cc16"
-                                    match_text = "✓ Bon"
-                                elif critere['ecart'] > -20:
-                                    match_color = "#fbbf24"
-                                    match_text = "~ Correct"
-                                else:
-                                    match_color = "#ff5a5f"
-                                    match_text = "✗ Faible"
-                            
                             st.markdown(
                                 f"""
-                                <div style="margin-bottom: 12px; padding: 12px; background: white; border-radius: 8px; border-left: 4px solid {match_color};">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div style="margin-bottom: 16px; padding: 14px; background: white; border-radius: 10px; border: 1px solid #e5e7eb;">
+                                    <div style="margin-bottom: 10px;">
                                         <span style="color: #121212; font-weight: 600; font-size: 14px;">{critere['nom']}</span>
-                                        <span style="color: {match_color}; font-weight: bold; font-size: 12px;">{match_text}</span>
                                     </div>
-                                    <div style="margin-bottom: 4px;">
-                                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
-                                            <span style="color: #6b7280;">Votre priorité</span>
-                                            <span style="color: #6b7280;">{critere['attente']:.0f}%</span>
+                                    <div style="margin-bottom: 6px;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; color: #6b7280;">
+                                            <span>Ce que vous cherchez</span>
+                                            <span style="font-weight: 600; color: #374151;">{critere['attente']:.0f}%</span>
                                         </div>
-                                        <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                                            <div style="background: #9ca3af; height: 100%; width: {critere['attente']:.0f}%;"></div>
+                                        <div style="background: #f3f4f6; height: 10px; border-radius: 5px; overflow: hidden;">
+                                            <div style="background: #3b82f6; height: 100%; width: {critere['attente']:.0f}%;"></div>
                                         </div>
                                     </div>
                                     <div>
-                                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
-                                            <span style="color: #6b7280;">Performance zone</span>
-                                            <span style="color: #6b7280;">{critere['zone']:.0f}%</span>
+                                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; color: #6b7280;">
+                                            <span>Ce que le quartier offre</span>
+                                            <span style="font-weight: 600; color: #374151;">{critere['zone']:.0f}%</span>
                                         </div>
-                                        <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                                            <div style="background: {match_color}; height: 100%; width: {critere['zone']:.0f}%;"></div>
+                                        <div style="background: #f3f4f6; height: 10px; border-radius: 5px; overflow: hidden;">
+                                            <div style="background: #8b5cf6; height: 100%; width: {critere['zone']:.0f}%;"></div>
                                         </div>
                                     </div>
                                 </div>
