@@ -185,7 +185,7 @@ LOGIQUE_QUESTIONS = {
 def charger_matrice():
     """Charge la matrice de données depuis Excel"""
     try:
-        df = pd.read_excel(FICHIER_MATRICE, sheet_name=NOM_FEUILLE)
+        df = pd.read_excel(FICHIER_MATRICE, sheet_name=NOM_FEUILLE, engine='openpyxl')
         
         if 'NOM_IRIS' not in df.columns:
             print("❌ ERREUR : La colonne 'NOM_IRIS' est manquante.")
@@ -194,6 +194,20 @@ def charger_matrice():
         if df.empty:
             print("❌ ERREUR : La feuille Excel est vide.")
             return None
+        
+        # Fix encoding si nécessaire (double-encodage UTF-8)
+        def fix_encoding(text):
+            if not isinstance(text, str):
+                return text
+            try:
+                # Si le texte contient des caractères mal encodés, corriger
+                if 'Ã' in text:
+                    return text.encode('latin1').decode('utf-8')
+                return text
+            except:
+                return text
+        
+        df['NOM_IRIS'] = df['NOM_IRIS'].apply(fix_encoding)
         
         # Nettoyage
         cols_norm = [col for col in df.columns if col.startswith('Norm_')]
