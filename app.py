@@ -1180,7 +1180,10 @@ else:
                 "fillOpacity": 0.8,
             },
             popup=folium.Popup(popup_text, max_width=300),
-            tooltip=folium.Tooltip(f"Score: {score:.0f}", style=f"background-color: {color}; color: white; font-weight: bold; border: none; padding: 4px 8px; border-radius: 4px;"),
+            tooltip=folium.Tooltip(
+                f'<div style="background-color: {color}; color: white; font-weight: bold; border: none; padding: 4px 8px; border-radius: 4px;">Score: {score:.0f}</div>',
+                sticky=False
+            ),
         ).add_to(m)
 
     # Afficher la carte dans Streamlit
