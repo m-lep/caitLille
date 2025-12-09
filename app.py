@@ -1330,21 +1330,27 @@ else:
                 # Afficher les performances avec comparaison attentes vs réalité
                 st.markdown("**📊 Compatibilité : Vos attentes vs Cette zone**")
                 
-                # Traductions françaises des critères
+                # Traductions françaises des critères avec regroupements
                 traductions = {
                     'Norm_Bruit': '🔇 Calme',
                     'Norm_Prix': '💰 Prix abordable',
                     'Norm_Surface_Verte_m2': '🌳 Espaces verts',
-                    'Norm_Nb_Pharmacies': '💊 Pharmacies',
-                    'Norm_Nb_Commerces': '🏪 Commerces',
-                    'Norm_Nb_Restaurants': '🍽️ Restaurants',
+                    'Norm_Nb_Pharmacies': '🏪 Services de proximité',  # Regroupé
+                    'Norm_Nb_Commerces': '🏪 Services de proximité',   # Regroupé
+                    'Norm_Nb_Restaurants': '🍽️ Vie animée',             # Regroupé
+                    'Norm_Nb_Bars': '🍽️ Vie animée',                    # Regroupé
                     'Norm_Nb_Transports': '🚇 Transports',
                     'Norm_Nb_VLille': '🚴 V\'Lille',
                     'Norm_Nb_ParcsEnfants': '👶 Aires de jeux',
                     'Norm_Nb_ComplexesSportifs': '⚽ Complexes sportifs',
                     'Norm_Nb_Ecoles': '🏫 Écoles',
-                    'Norm_Nb_Bars': '🍺 Bars',
                     'Norm_Nb_Parkings': '🅿️ Parkings',
+                }
+                
+                # Définir les regroupements
+                regroupements = {
+                    '🏪 Services de proximité': ['Norm_Nb_Pharmacies', 'Norm_Nb_Commerces'],
+                    '🍽️ Vie animée': ['Norm_Nb_Restaurants', 'Norm_Nb_Bars'],
                 }
                 
                 # Si le quiz est complété, afficher comparaison attentes vs zone
@@ -1362,24 +1368,46 @@ else:
                     total_poids = sum(poids.values())
                     
                     if total_poids > 0:
-                        # Récupérer SEULEMENT les critères que l'utilisateur a sélectionnés (poids > 0)
-                        criteres_importants = []
-                        # Trouver le poids max pour normaliser
+                        # Créer un dictionnaire pour les critères regroupés
+                        criteres_groupes = {}
                         poids_max = max(poids.values()) if poids.values() else 1
                         
                         for critere, poids_critere in poids.items():
                             if poids_critere > 0 and critere in quartier_row.columns:
-                                valeur_zone = quartier_row.iloc[0][critere] * 100
-                                # Normaliser le poids sur 100 (0 = pas important, 100 = très important)
-                                importance = (poids_critere / poids_max) * 100
                                 nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
-                                criteres_importants.append({
-                                    'nom': nom_francais,
-                                    'attente': importance,
-                                    'zone': valeur_zone,
-                                    'ecart': valeur_zone - importance,
-                                    'poids_brut': poids_critere  # Pour le tri
-                                })
+                                valeur_zone = quartier_row.iloc[0][critere] * 100
+                                
+                                # Si ce critère fait partie d'un regroupement
+                                if nom_francais in criteres_groupes:
+                                    # Ajouter au groupe existant (moyenne des valeurs)
+                                    criteres_groupes[nom_francais]['poids_brut'] += poids_critere
+                                    criteres_groupes[nom_francais]['valeur_zone'] = (
+                                        criteres_groupes[nom_francais]['valeur_zone'] + valeur_zone
+                                    ) / 2
+                                    criteres_groupes[nom_francais]['count'] += 1
+                                else:
+                                    # Nouveau critère
+                                    criteres_groupes[nom_francais] = {
+                                        'nom': nom_francais,
+                                        'poids_brut': poids_critere,
+                                        'valeur_zone': valeur_zone,
+                                        'count': 1
+                                    }
+                        
+                        # Convertir en liste et calculer les métriques finales
+                        criteres_importants = []
+                        # Recalculer poids_max après regroupement
+                        poids_max = max(c['poids_brut'] for c in criteres_groupes.values())
+                        
+                        for nom, data in criteres_groupes.items():
+                            importance = (data['poids_brut'] / poids_max) * 100
+                            criteres_importants.append({
+                                'nom': nom,
+                                'attente': importance,
+                                'zone': data['valeur_zone'],
+                                'ecart': data['valeur_zone'] - importance,
+                                'poids_brut': data['poids_brut']
+                            })
                         
                         # Trier par poids brut décroissant (critères les plus importants en premier)
                         criteres_importants.sort(key=lambda x: x['poids_brut'], reverse=True)
