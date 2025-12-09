@@ -1444,8 +1444,8 @@ else:
                                 'poids_brut': data['poids_brut']
                             })
                         
-                        # Trier par performance de la zone décroissante (points forts en premier)
-                        criteres_importants.sort(key=lambda x: x['zone'], reverse=True)
+                        # Trier par priorité utilisateur (attente) décroissante
+                        criteres_importants.sort(key=lambda x: x['attente'], reverse=True)
                         
                         # Afficher détails budget si c'est un critère important
                         if any(c['nom'] == '💰 Prix abordable' for c in criteres_importants):
