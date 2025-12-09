@@ -17,17 +17,70 @@ Chaque réponse définit **ce qui compte le plus pour vous** :
 
 ### 2️⃣ Calcul des poids personnalisés
 
-Chaque réponse ajuste l'**importance** (poids) des critères :
+Chaque réponse ajuste l'**importance** (poids) des critères. Voici **exactement** ce qui se passe :
 
-**Exemple : Budget serré**
-- Prix du m² → **Poids 30** (ultra prioritaire !)
-- Autres critères → poids standards (5-15)
+#### 📋 **Q1 : Budget**
 
-**Exemple : Parent**
-- Écoles → **+5 points** de poids
-- Aires de jeux → **+5 points**
+| Réponse | Impact sur les poids |
+|---------|---------------------|
+| **Serré (< 2000€/m²)** | Prix: **+30** (ultra prioritaire !), Services proximité: +2, Transports: +2 |
+| **Modéré (2000-3000€/m²)** | Prix: **+18**, Services proximité: +2, Vie animée: +1 |
+| **Confortable (3000-4000€/m²)** | Prix: **+10**, Vie animée: +2, Services proximité: +2 |
+| **Aucune limite (> 4000€/m²)** | Vie animée: +3, Services proximité: +2, Calme: +1 |
 
-**Les poids s'additionnent** : si vous êtes parent + budget serré, Prix=30 ET Écoles=10
+#### 🌆 **Q2 : Ambiance**
+
+| Réponse | Impact sur les poids |
+|---------|---------------------|
+| **Très calme, nature et verdure** | Calme: **+4**, Vie animée: **-3**, Services proximité: +1 |
+| **Calme avec services de base** | Calme: **+3**, Services proximité: +3, Vie animée: -1 |
+| **Dynamique et urbain** | Vie animée: **+3**, Transports: +2, Calme: **-2**, Services proximité: +2 |
+| **Très animé (vie nocturne, bars)** | Vie animée: **+5**, Transports: +3, Calme: **-4** |
+
+#### 🏠 **Q3 : Mode de vie**
+
+| Réponse | Impact sur les poids |
+|---------|---------------------|
+| **Je cuisine, j'aime le calme** | Services proximité: +3, Calme: +3, Vie animée: -1 |
+| **Équilibré (cuisine + sorties)** | Services proximité: +2, Vie animée: +2, Transports: +2 |
+| **Je sors souvent au resto/bars** | Vie animée: **+4**, Transports: +2, Services proximité: +1 |
+| **Vie nocturne intense** | Vie animée: **+5**, Transports: +3, Calme: **-3** |
+
+#### 👤 **Q4 : Statut**
+
+| Réponse | Impact sur les poids |
+|---------|---------------------|
+| **Parent (avec enfants)** | Famille (écoles/aires): **+5**, Calme: +3, Services proximité: +2, Vie animée: **-2** |
+| **Étudiant(e)** | Vie animée: **+4**, Transports: +3, Calme: **-2**, Famille: **-3** |
+| **Jeune actif(ve)** | Vie animée: +3, Transports: +2, Services proximité: +2 |
+| **Senior / Retraité(e)** | Calme: **+4**, Services proximité: +3, Vie animée: **-2**, Transports: +1 |
+
+#### 🚗 **Q5 : Transport**
+
+| Réponse | Impact sur les poids |
+|---------|---------------------|
+| **Transports en commun uniquement** | Transports: **+5**, Services proximité: +2, Parking: **-3** |
+| **Vélo / V'Lille** | Transports: +3, Services proximité: +2, Calme: +1, Parking: -2 |
+| **Voiture personnelle** | Parking: **+4**, Services proximité: +2, Transports: -1 |
+| **Mix voiture + transports** | Parking: +2, Transports: +2, Services proximité: +1 |
+
+#### ⚽ **Q6 : Activité physique**
+
+| Réponse | Impact sur les poids |
+|---------|---------------------|
+| **Très sportif (besoin d'équipements)** | Sport: **+4**, Calme: +2, Vie animée: +1 |
+| **Sportif occasionnel** | Sport: +2, Calme: +1 |
+| **Peu sportif** | Services proximité: +1, Vie animée: +1 |
+| **Pas du tout** | Vie animée: +2, Sport: **-2** |
+
+#### 💡 **Les poids s'additionnent !**
+
+**Exemple : Parent + Budget serré + Calme**
+- Prix: **30** (budget serré)
+- Famille: **5** (parent)
+- Calme: **3** (parent) + **4** (ambiance calme) = **7**
+- Services proximité: **2** (budget) + **2** (parent) = **4**
+- Vie animée: **-2** (parent) + **-3** (ambiance calme) = **-5** (ignoré, devient 0)
 
 ### 3️⃣ Normalisation des données (0 → 1)
 
