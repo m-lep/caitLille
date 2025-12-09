@@ -1270,94 +1270,118 @@ else:
                             unsafe_allow_html=True
                         )
                 
-                # Afficher les performances brutes de la zone IRIS
-                st.markdown("**📊 Performances de la zone :**")
+                # Afficher les performances avec comparaison attentes vs réalité
+                st.markdown("**📊 Compatibilité : Vos attentes vs Cette zone**")
                 
                 # Traductions françaises des critères
                 traductions = {
-                    'Norm_Bruit': '🔇 Calme (peu de bruit)',
+                    'Norm_Bruit': '🔇 Calme',
                     'Norm_Prix': '💰 Prix abordable',
                     'Norm_Surface_Verte_m2': '🌳 Espaces verts',
                     'Norm_Nb_Pharmacies': '💊 Pharmacies',
                     'Norm_Nb_Commerces': '🏪 Commerces',
                     'Norm_Nb_Restaurants': '🍽️ Restaurants',
-                    'Norm_Nb_Transports': '🚇 Transports en commun',
-                    'Norm_Nb_VLille': '🚴 Stations V\'Lille',
+                    'Norm_Nb_Transports': '🚇 Transports',
+                    'Norm_Nb_VLille': '🚴 V\'Lille',
                     'Norm_Nb_ParcsEnfants': '👶 Aires de jeux',
                     'Norm_Nb_ComplexesSportifs': '⚽ Complexes sportifs',
                     'Norm_Nb_Ecoles': '🏫 Écoles',
-                    'Norm_Nb_Bars': '🍺 Bars & vie nocturne',
+                    'Norm_Nb_Bars': '🍺 Bars',
                     'Norm_Nb_Parkings': '🅿️ Parkings',
                 }
                 
-                # Récupérer toutes les performances normalisées
-                performances = {}
-                for critere, label in traductions.items():
-                    if critere in quartier_row.columns:
-                        valeur = quartier_row.iloc[0][critere]
-                        performances[label] = valeur * 100  # Convertir en pourcentage
-                
-                # Trier par performance décroissante
-                performances_triees = sorted(performances.items(), key=lambda x: x[1], reverse=True)
-                
-                # Afficher toutes les performances
-                for nom_critere, performance in performances_triees:
-                    # Couleur selon la performance
-                    perf_color = "#10b981" if performance > 60 else "#ff5a5f" if performance < 40 else "#fbbf24"
-                    bar_width = min(performance, 100)
-                    st.markdown(
-                        f"""
-                        <div style="margin-bottom: 8px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
-                                <span style="color: #121212;">{nom_critere}</span>
-                                <span style="color: #6c6c6c;">{performance:.0f}/100</span>
-                            </div>
-                            <div style="background: #f3f4f6; height: 6px; border-radius: 3px; overflow: hidden;">
-                                <div style="background: {perf_color}; height: 100%; width: {bar_width}%; transition: width 0.3s ease;"></div>
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-                
-                # Si le quiz est complété, afficher aussi la contribution de chaque critère au score
+                # Si le quiz est complété, afficher comparaison attentes vs zone
                 if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty and len(st.session_state.reponses) > 0:
                     poids = consolider_poids_utilisateur(st.session_state.reponses)
                     total_poids = sum(poids.values())
+                    
                     if total_poids > 0:
-                        st.markdown("---")
-                        st.markdown("**🎯 Impact sur votre score personnalisé :**")
-                        st.caption(f"_Basé sur vos {len([p for p in poids.values() if p > 0])} critères sélectionnés_")
-                        
-                        # Calculer la contribution pondérée
-                        contributions = {}
+                        # Récupérer tous les critères avec poids > 0
+                        criteres_importants = []
                         for critere, poids_critere in poids.items():
                             if poids_critere > 0 and critere in quartier_row.columns:
-                                valeur_normalisee = quartier_row.iloc[0][critere]
-                                contribution = (valeur_normalisee * poids_critere / total_poids) * 100
+                                valeur_zone = quartier_row.iloc[0][critere] * 100
+                                importance = (poids_critere / total_poids) * 100
                                 nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
-                                contributions[nom_francais] = contribution
+                                criteres_importants.append({
+                                    'nom': nom_francais,
+                                    'attente': importance,
+                                    'zone': valeur_zone,
+                                    'ecart': valeur_zone - importance
+                                })
                         
-                        # Afficher top 5 contributions
-                        if contributions:
-                            top_contributions = sorted(contributions.items(), key=lambda x: x[1], reverse=True)[:5]
-                            for nom_critere, contribution in top_contributions:
-                                bar_width = min(contribution, 100)
-                                contrib_color = "#10b981" if contribution > 20 else "#ff5a5f" if contribution < 10 else "#fbbf24"
-                                st.markdown(
-                                    f"""
-                                    <div style="margin-bottom: 8px;">
-                                        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
-                                            <span style="color: #121212;">{nom_critere}</span>
-                                            <span style="color: #6c6c6c;">{contribution:.1f} pts</span>
+                        # Trier par importance décroissante
+                        criteres_importants.sort(key=lambda x: x['attente'], reverse=True)
+                        
+                        # Afficher le graphique de comparaison
+                        for critere in criteres_importants:
+                            if critere['ecart'] > 20:
+                                match_color = "#10b981"
+                                match_text = "✅ Excellent"
+                            elif critere['ecart'] > 0:
+                                match_color = "#84cc16"
+                                match_text = "✓ Bon"
+                            elif critere['ecart'] > -20:
+                                match_color = "#fbbf24"
+                                match_text = "~ Correct"
+                            else:
+                                match_color = "#ff5a5f"
+                                match_text = "✗ Faible"
+                            
+                            st.markdown(
+                                f"""
+                                <div style="margin-bottom: 12px; padding: 12px; background: white; border-radius: 8px; border-left: 4px solid {match_color};">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <span style="color: #121212; font-weight: 600; font-size: 14px;">{critere['nom']}</span>
+                                        <span style="color: {match_color}; font-weight: bold; font-size: 12px;">{match_text}</span>
+                                    </div>
+                                    <div style="margin-bottom: 4px;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                                            <span style="color: #6b7280;">Votre priorité</span>
+                                            <span style="color: #6b7280;">{critere['attente']:.0f}%</span>
                                         </div>
-                                        <div style="background: #f3f4f6; height: 6px; border-radius: 3px; overflow: hidden;">
-                                            <div style="background: {contrib_color}; height: 100%; width: {bar_width}%; transition: width 0.3s ease;"></div>
+                                        <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                                            <div style="background: #9ca3af; height: 100%; width: {critere['attente']:.0f}%;"></div>
                                         </div>
                                     </div>
-                                    """,
-                                    unsafe_allow_html=True
-                                )
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                                            <span style="color: #6b7280;">Performance zone</span>
+                                            <span style="color: #6b7280;">{critere['zone']:.0f}%</span>
+                                        </div>
+                                        <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                                            <div style="background: {match_color}; height: 100%; width: {critere['zone']:.0f}%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+                else:
+                    # Si pas de quiz, afficher juste les performances brutes
+                    st.caption("_Complétez le quiz pour voir la comparaison avec vos attentes_")
+                    performances = {}
+                    for critere, label in traductions.items():
+                        if critere in quartier_row.columns:
+                            valeur = quartier_row.iloc[0][critere]
+                            performances[label] = valeur * 100
+                    performances_triees = sorted(performances.items(), key=lambda x: x[1], reverse=True)
+                    for nom_critere, performance in performances_triees:
+                        perf_color = "#10b981" if performance > 60 else "#ff5a5f" if performance < 40 else "#fbbf24"
+                        st.markdown(
+                            f"""
+                            <div style="margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                                    <span style="color: #121212;">{nom_critere}</span>
+                                    <span style="color: #6c6c6c;">{performance:.0f}/100</span>
+                                </div>
+                                <div style="background: #f3f4f6; height: 6px; border-radius: 3px; overflow: hidden;">
+                                    <div style="background: {perf_color}; height: 100%; width: {performance:.0f}%;"></div>
+                                </div>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
         
         # Section annonces immobilières
         st.markdown("---")
