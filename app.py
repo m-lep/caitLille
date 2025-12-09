@@ -1232,49 +1232,16 @@ else:
         st.markdown("---")
         st.markdown(f"### 📍 {nom_iris}")
         
-        # Afficher l'explication du score si disponible
-        if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty:
-            quartier_data = st.session_state.tous_scores[st.session_state.tous_scores['NOM_IRIS'] == nom_iris]
-            if not quartier_data.empty:
-                score = quartier_data.iloc[0]['Score_Max']
-                
-                # Calculer les détails du scoring
-                if st.session_state.matrice_data is not None and len(st.session_state.reponses) > 0:
-                    poids = consolider_poids_utilisateur(st.session_state.reponses)
-                    
-                    # Trouver la ligne correspondante dans la matrice
-                    quartier_row = st.session_state.matrice_data[st.session_state.matrice_data['NOM_IRIS'] == nom_iris]
-                    if not quartier_row.empty:
-                        # Calculer la contribution de chaque critère
-                        contributions = {}
-                        total_poids = sum(poids.values())
-                        
-                        # Traductions françaises des critères
-                        traductions = {
-                            'Norm_Bruit': '🔇 Calme (peu de bruit)',
-                            'Norm_Prix': '💰 Prix abordable',
-                            'Norm_Surface_Verte_m2': '🌳 Espaces verts',
-                            'Norm_Nb_Pharmacies': '💊 Pharmacies',
-                            'Norm_Nb_Commerces': '🏪 Commerces',
-                            'Norm_Nb_Restaurants': '🍽️ Restaurants',
-                            'Norm_Nb_Transports': '🚇 Transports en commun',
-                            'Norm_Nb_VLille': '🚴 Stations V\'Lille',
-                            'Norm_Nb_ParcsEnfants': '👶 Aires de jeux',
-                            'Norm_Nb_ComplexesSportifs': '⚽ Complexes sportifs',
-                            'Norm_Nb_Ecoles': '🏫 Écoles',
-                            'Norm_Nb_Bars': '🍺 Bars & vie nocturne',
-                            'Norm_Nb_Parkings': '🅿️ Parkings',
-                        }
-                        
-                        for critere, poids_critere in poids.items():
-                            if poids_critere > 0 and critere in quartier_row.columns:
-                                valeur_normalisee = quartier_row.iloc[0][critere]
-                                contribution = (valeur_normalisee * poids_critere / total_poids) * 100
-                                # Utiliser la traduction française avec emoji
-                                nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
-                                contributions[nom_francais] = contribution
-                        
-                        # Afficher l'explication du score
+        # Récupérer les données de l'IRIS depuis la matrice
+        if st.session_state.matrice_data is not None:
+            quartier_row = st.session_state.matrice_data[st.session_state.matrice_data['NOM_IRIS'] == nom_iris]
+            
+            if not quartier_row.empty:
+                # Afficher le score de compatibilité si le quiz est terminé
+                if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty:
+                    quartier_data = st.session_state.tous_scores[st.session_state.tous_scores['NOM_IRIS'] == nom_iris]
+                    if not quartier_data.empty:
+                        score = quartier_data.iloc[0]['Score_Max']
                         score_color = "#10b981" if score > 60 else "#ff5a5f" if score < 40 else "#fbbf24"
                         st.markdown(
                             f"""
@@ -1283,19 +1250,86 @@ else:
                                     <h4 style="margin: 0; color: #121212;">💯 Score de compatibilité</h4>
                                     <div style="font-size: 24px; font-weight: bold; color: {score_color};">{score:.0f}/100</div>
                                 </div>
-                                <p style="color: #6c6c6c; font-size: 14px; margin: 0;">Ce score est calculé en fonction de vos préférences. Voici comment il se décompose :</p>
+                                <p style="color: #6c6c6c; font-size: 14px; margin: 0;">Ce score est calculé en fonction de vos préférences.</p>
                             </div>
                             """,
                             unsafe_allow_html=True
                         )
+                
+                # Afficher les performances brutes de la zone IRIS
+                st.markdown("**📊 Performances de la zone :**")
+                
+                # Traductions françaises des critères
+                traductions = {
+                    'Norm_Bruit': '🔇 Calme (peu de bruit)',
+                    'Norm_Prix': '💰 Prix abordable',
+                    'Norm_Surface_Verte_m2': '🌳 Espaces verts',
+                    'Norm_Nb_Pharmacies': '💊 Pharmacies',
+                    'Norm_Nb_Commerces': '🏪 Commerces',
+                    'Norm_Nb_Restaurants': '🍽️ Restaurants',
+                    'Norm_Nb_Transports': '🚇 Transports en commun',
+                    'Norm_Nb_VLille': '🚴 Stations V\'Lille',
+                    'Norm_Nb_ParcsEnfants': '👶 Aires de jeux',
+                    'Norm_Nb_ComplexesSportifs': '⚽ Complexes sportifs',
+                    'Norm_Nb_Ecoles': '🏫 Écoles',
+                    'Norm_Nb_Bars': '🍺 Bars & vie nocturne',
+                    'Norm_Nb_Parkings': '🅿️ Parkings',
+                }
+                
+                # Récupérer toutes les performances normalisées
+                performances = {}
+                for critere, label in traductions.items():
+                    if critere in quartier_row.columns:
+                        valeur = quartier_row.iloc[0][critere]
+                        performances[label] = valeur * 100  # Convertir en pourcentage
+                
+                # Trier par performance décroissante
+                performances_triees = sorted(performances.items(), key=lambda x: x[1], reverse=True)
+                
+                # Afficher toutes les performances
+                for nom_critere, performance in performances_triees:
+                    # Couleur selon la performance
+                    perf_color = "#10b981" if performance > 60 else "#ff5a5f" if performance < 40 else "#fbbf24"
+                    bar_width = min(performance, 100)
+                    st.markdown(
+                        f"""
+                        <div style="margin-bottom: 8px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                                <span style="color: #121212;">{nom_critere}</span>
+                                <span style="color: #6c6c6c;">{performance:.0f}/100</span>
+                            </div>
+                            <div style="background: #f3f4f6; height: 6px; border-radius: 3px; overflow: hidden;">
+                                <div style="background: {perf_color}; height: 100%; width: {bar_width}%; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                
+                # Si le quiz est complété, afficher aussi la contribution de chaque critère au score
+                if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty and len(st.session_state.reponses) > 0:
+                    poids = consolider_poids_utilisateur(st.session_state.reponses)
+                    total_poids = sum(poids.values())
+                    if total_poids > 0:
+                        st.markdown("---")
+                        st.markdown("**🎯 Impact sur votre score personnalisé :**")
+                        st.caption(f"_Basé sur vos {len([p for p in poids.values() if p > 0])} critères sélectionnés_")
                         
-                        # Afficher les top 5 critères les plus importants
+                        # Calculer la contribution pondérée
+                        contributions = {}
+                        for critere, poids_critere in poids.items():
+                            if poids_critere > 0 and critere in quartier_row.columns:
+                                valeur_normalisee = quartier_row.iloc[0][critere]
+                                contribution = (valeur_normalisee * poids_critere / total_poids) * 100
+                                nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
+                                contributions[nom_francais] = contribution
+                        
+                        # Afficher top 5 contributions
                         if contributions:
                             top_contributions = sorted(contributions.items(), key=lambda x: x[1], reverse=True)[:5]
-                            st.markdown("**🎯 Principaux facteurs influençant ce score :**")
-                            st.caption(f"_Poids total appliqué : {sum(poids.values())} points répartis sur {len([p for p in poids.values() if p > 0])} critères_")
                             for nom_critere, contribution in top_contributions:
-                                bar_width = min(contribution, 100)  # Cap à 100%
+                                bar_width = min(contribution, 100)
+                                contrib_color = "#10b981" if contribution > 20 else "#ff5a5f" if contribution < 10 else "#fbbf24"
                                 st.markdown(
                                     f"""
                                     <div style="margin-bottom: 8px;">
@@ -1304,7 +1338,7 @@ else:
                                             <span style="color: #6c6c6c;">{contribution:.1f} pts</span>
                                         </div>
                                         <div style="background: #f3f4f6; height: 6px; border-radius: 3px; overflow: hidden;">
-                                            <div style="background: {score_color}; height: 100%; width: {bar_width}%; transition: width 0.3s ease;"></div>
+                                            <div style="background: {contrib_color}; height: 100%; width: {bar_width}%; transition: width 0.3s ease;"></div>
                                         </div>
                                     </div>
                                     """,
