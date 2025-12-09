@@ -1326,18 +1326,40 @@ else:
                         
                         # Afficher le graphique de comparaison pour TOUS les critères importants
                         for critere in criteres_importants:
-                            if critere['ecart'] > 20:
-                                match_color = "#10b981"
-                                match_text = "✅ Excellent"
-                            elif critere['ecart'] > 0:
-                                match_color = "#84cc16"
-                                match_text = "✓ Bon"
-                            elif critere['ecart'] > -20:
-                                match_color = "#fbbf24"
-                                match_text = "~ Correct"
+                            # Pour le prix, la logique est inversée :
+                            # Norm_Prix élevé = pas cher (bon pour budget serré)
+                            # Donc si zone a Norm_Prix élevé ET tu veux budget serré → VERT
+                            is_prix = critere['nom'] == '💰 Prix abordable'
+                            
+                            if is_prix:
+                                # Pour le prix : plus la zone est ÉLEVÉE (pas chère), mieux c'est
+                                # On compare directement les valeurs
+                                if critere['zone'] > 70:  # Zone très abordable
+                                    match_color = "#10b981"
+                                    match_text = "✅ Très abordable"
+                                elif critere['zone'] > 50:  # Zone abordable
+                                    match_color = "#84cc16"
+                                    match_text = "✓ Abordable"
+                                elif critere['zone'] > 30:  # Zone un peu chère
+                                    match_color = "#fbbf24"
+                                    match_text = "~ Prix moyen"
+                                else:  # Zone très chère
+                                    match_color = "#ff5a5f"
+                                    match_text = "✗ Cher"
                             else:
-                                match_color = "#ff5a5f"
-                                match_text = "✗ Faible"
+                                # Pour les autres critères : logique normale
+                                if critere['ecart'] > 20:
+                                    match_color = "#10b981"
+                                    match_text = "✅ Excellent"
+                                elif critere['ecart'] > 0:
+                                    match_color = "#84cc16"
+                                    match_text = "✓ Bon"
+                                elif critere['ecart'] > -20:
+                                    match_color = "#fbbf24"
+                                    match_text = "~ Correct"
+                                else:
+                                    match_color = "#ff5a5f"
+                                    match_text = "✗ Faible"
                             
                             st.markdown(
                                 f"""
