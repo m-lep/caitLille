@@ -1462,22 +1462,25 @@ else:
                                         <span style="color: #121212; font-weight: 600; font-size: 14px;">{critere['nom']}</span>
                                     </div>
                                     <div style="margin-bottom: 6px;">
-                                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; color: #6b7280;">
+                                        <div style="font-size: 11px; margin-bottom: 3px; color: #6b7280;">
                                             <span>Ce que vous cherchez</span>
-                                            <span style="font-weight: 600; color: #374151;">{critere['attente']:.0f}%</span>
                                         </div>
                                         <div style="background: #f3f4f6; height: 10px; border-radius: 5px; overflow: hidden;">
                                             <div style="background: #3b82f6; height: 100%; width: {critere['attente']:.0f}%;"></div>
                                         </div>
                                     </div>
                                     <div>
-                                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; color: #6b7280;">
+                                        <div style="font-size: 11px; margin-bottom: 3px; color: #6b7280;">
                                             <span>Ce que le quartier offre</span>
-                                            <span style="font-weight: 600; color: #374151;">{critere['zone']:.0f}%</span>
                                         </div>
                                         <div style="background: #f3f4f6; height: 10px; border-radius: 5px; overflow: hidden;">
                                             <div style="background: #8b5cf6; height: 100%; width: {critere['zone']:.0f}%;"></div>
                                         </div>
+                                    </div>
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
                                     </div>
                                 </div>
                                 """,
