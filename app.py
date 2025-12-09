@@ -1180,7 +1180,7 @@ else:
                 "fillOpacity": 0.8,
             },
             popup=folium.Popup(popup_text, max_width=300),
-            tooltip=folium.Tooltip(f"{nom_iris} - Score: {score}/100"),
+            tooltip=folium.Tooltip(f"Score: {score:.0f}", style=f"background-color: {color}; color: white; font-weight: bold; border: none; padding: 4px 8px; border-radius: 4px;"),
         ).add_to(m)
 
     # Afficher la carte dans Streamlit
@@ -1244,12 +1244,12 @@ else:
         except Exception:
             pass
 
-    # Afficher les annonces du quartier sélectionné
+    # Afficher les détails du quartier sélectionné
     if st.session_state.selected_quartier:
         nom_iris = st.session_state.selected_quartier
 
         st.markdown("---")
-        st.markdown(f"### 🏠 Offres disponibles — {nom_iris}")
+        st.markdown(f"### 📍 {nom_iris}")
         
         # Afficher l'explication du score si disponible
         if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty:
@@ -1329,8 +1329,11 @@ else:
                                     """,
                                     unsafe_allow_html=True
                                 )
-                            st.markdown("---")
-
+        
+        # Section annonces immobilières
+        st.markdown("---")
+        st.markdown(f"### 🏠 Offres disponibles")
+        
         # Scraper les annonces réelles
         with st.spinner("Chargement des offres..."):
             annonces = scraper_immosens(secteur=nom_iris, max_annonces=10)
