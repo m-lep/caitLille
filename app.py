@@ -1142,16 +1142,23 @@ else:
     
     if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty:
         # Utiliser TOUS les scores calculés
+        # Gérer les deux formats de colonnes : Score_Max (recommander_quartiers) ou Score_Final_100 (calculer_tous_scores)
+        score_col = 'Score_Max' if 'Score_Max' in st.session_state.tous_scores.columns else 'Score_Final_100'
+        
         for _, row in st.session_state.tous_scores.iterrows():
-            scores_par_nom[row['NOM_IRIS']] = row['Score_Max']
+            scores_par_nom[row['NOM_IRIS']] = row[score_col]
             # Aussi stocker par CODE_IRIS si disponible
-            if 'IRIS_Meilleur' in row:
-                scores_par_code[str(row['IRIS_Meilleur'])] = row['Score_Max']
+            if 'CODE_IRIS' in row:
+                scores_par_code[str(row['CODE_IRIS'])] = row[score_col]
+            elif 'IRIS_Meilleur' in row:
+                scores_par_code[str(row['IRIS_Meilleur'])] = row[score_col]
     elif st.session_state.top_quartiers is not None and not st.session_state.top_quartiers.empty:
         # Fallback sur le top 3
         for _, row in st.session_state.top_quartiers.iterrows():
             scores_par_nom[row['NOM_IRIS']] = row['Score_Max']
-            if 'IRIS_Meilleur' in row:
+            if 'CODE_IRIS' in row:
+                scores_par_code[str(row['CODE_IRIS'])] = row['Score_Max']
+            elif 'IRIS_Meilleur' in row:
                 scores_par_code[str(row['IRIS_Meilleur'])] = row['Score_Max']
     
     # Si on a les scores mais pas de mapping CODE_IRIS, charger depuis matrice
@@ -1303,7 +1310,9 @@ else:
                 if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty:
                     quartier_data = st.session_state.tous_scores[st.session_state.tous_scores['NOM_IRIS'] == nom_iris]
                     if not quartier_data.empty:
-                        score = quartier_data.iloc[0]['Score_Max']
+                        # Gérer les deux formats de colonnes
+                        score_col = 'Score_Max' if 'Score_Max' in quartier_data.columns else 'Score_Final_100'
+                        score = quartier_data.iloc[0][score_col]
                         score_color = "#10b981" if score > 60 else "#ff5a5f" if score < 40 else "#fbbf24"
                         st.markdown(
                             f"""
