@@ -1298,10 +1298,14 @@ else:
                     if total_poids > 0:
                         # Récupérer tous les critères avec poids > 0
                         criteres_importants = []
+                        # Trouver le poids max pour normaliser
+                        poids_max = max(poids.values()) if poids.values() else 1
+                        
                         for critere, poids_critere in poids.items():
                             if poids_critere > 0 and critere in quartier_row.columns:
                                 valeur_zone = quartier_row.iloc[0][critere] * 100
-                                importance = (poids_critere / total_poids) * 100
+                                # Normaliser le poids sur 100 (0 = pas important, 100 = très important)
+                                importance = (poids_critere / poids_max) * 100
                                 nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
                                 criteres_importants.append({
                                     'nom': nom_francais,
