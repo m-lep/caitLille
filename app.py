@@ -487,7 +487,7 @@ st.markdown(
             line-height: 1.4 !important;
         }
 
-        /* Bouton 1: Pas intéressé (gris) */
+        /* Bouton 1: Gris neutre */
         [data-testid="stHorizontalBlock"] > div:nth-child(1) [data-testid="stButton"] button {
             background: #f3f4f6 !important;
             color: #6b7280 !important;
@@ -501,44 +501,46 @@ st.markdown(
             box-shadow: 0 4px 12px rgba(107, 114, 128, 0.15) !important;
         }
 
-        /* Bouton 2: Moyen intéressé (orange clair) */
+        /* Bouton 2: Gris neutre (identique) */
         [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stButton"] button {
-            background: #fef3c7 !important;
-            color: #d97706 !important;
-            border: 2px solid #fcd34d !important;
+            background: #f3f4f6 !important;
+            color: #6b7280 !important;
+            border: 2px solid #d1d5db !important;
         }
 
         [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stButton"] button:hover {
-            background: #fde68a !important;
-            border-color: #fbbf24 !important;
+            background: #e5e7eb !important;
+            border-color: #9ca3af !important;
             transform: translateY(-2px) !important;
-            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2) !important;
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.15) !important;
         }
 
-        /* Bouton 3: Intéressé (vert clair) */
+        /* Bouton 3: Gris neutre (identique) */
         [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stButton"] button {
-            background: #d1fae5 !important;
-            color: #059669 !important;
-            border: 2px solid #6ee7b7 !important;
+            background: #f3f4f6 !important;
+            color: #6b7280 !important;
+            border: 2px solid #d1d5db !important;
         }
 
         [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stButton"] button:hover {
-            background: #a7f3d0 !important;
-            border-color: #34d399 !important;
+            background: #e5e7eb !important;
+            border-color: #9ca3af !important;
             transform: translateY(-2px) !important;
-            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2) !important;
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.15) !important;
         }
 
-        /* Bouton 4: Très intéressé (vert foncé) */
+        /* Bouton 4: Gris neutre (identique) */
         [data-testid="stHorizontalBlock"] > div:nth-child(4) [data-testid="stButton"] button {
-            background: linear-gradient(135deg, #10b981, #059669) !important;
-            color: white !important;
-            border: none !important;
+            background: #f3f4f6 !important;
+            color: #6b7280 !important;
+            border: 2px solid #d1d5db !important;
         }
 
         [data-testid="stHorizontalBlock"] > div:nth-child(4) [data-testid="stButton"] button:hover {
+            background: #e5e7eb !important;
+            border-color: #9ca3af !important;
             transform: translateY(-2px) !important;
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3) !important;
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.15) !important;
         }
 
         /* Fin de quiz */
