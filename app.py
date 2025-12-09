@@ -478,13 +478,20 @@ st.markdown(
             border-radius: 16px !important;
             font-size: 13px !important;
             font-weight: 600 !important;
-            padding: 18px 10px !important;
+            padding: 20px 12px !important;
             border: none !important;
             transition: all 0.2s ease !important;
-            height: 120px !important;
+            min-height: 140px !important;
+            height: auto !important;
             width: 100% !important;
-            white-space: pre-line !important;
-            line-height: 1.4 !important;
+            white-space: normal !important;
+            line-height: 1.5 !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
         }
 
         /* Boutons réponse: Style Tinder épuré blanc/rose */
