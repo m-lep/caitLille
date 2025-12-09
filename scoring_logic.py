@@ -6,93 +6,122 @@ import numpy as np
 # --------------------------------------------------------------------------
 
 FICHIER_MATRICE = 'DATASET scores brut.xlsx'
-NOM_FEUILLE = 'Matrice_Brute_Normalisee'
+NOM_FEUILLE = 'Matrice_Brute_Normalisee_V2'
 
-# 1. Tous les critères normalisés de votre matrice Excel
+# Nouveaux critères de proximité (normalisés)
+NOUVELLES_PROXIMITES_NORM = [
+    'Norm_Prox_Densite_Ecoles',
+    'Norm_Prox_Densite_Commerces',
+    'Norm_Prox_Densite_Transports',
+    'Norm_Prox_Ratio_EspacesVerts'
+]
+
+# CRITÈRE D'ÉGALISATION
+CRITERE_EGALISATION = 'Norm_Equilibre_Global'
+
+# 1. Tous les critères normalisés (INCLUANT PROXIMITÉ ET ÉGALISATION)
 TOUS_LES_CRITERES_NORMALISES = [
     'Norm_Bruit', 'Norm_Prix', 'Norm_Surface_Verte_m2', 'Norm_Nb_Pharmacies',
     'Norm_Nb_Commerces', 'Norm_Nb_Restaurants', 'Norm_Nb_Transports',
     'Norm_Nb_VLille', 'Norm_Nb_ParcsEnfants', 'Norm_Nb_ComplexesSportifs',
     'Norm_Nb_Ecoles', 'Norm_Nb_Bars', 'Norm_Nb_Parkings'
-]
+] + NOUVELLES_PROXIMITES_NORM + [CRITERE_EGALISATION] # <-- AJOUT DU CRITÈRE
 
 # 2. Les 4 boutons représentent le niveau d'intérêt (1 à 4)
-# 😤 (bouton 1) = Pas intéressé (poids 1)
-# 😕 (bouton 2) = Moyen intéressé (poids 2)
-# 😊 (bouton 3) = Intéressé (poids 3)
-# 🤩 (bouton 4) = Très intéressé (poids 4)
-# Le poids est déterminé par la position du bouton cliqué, pas par le texte affiché
+# ...
 
-# 3. Logique de Scoring avec pondérations diversifiées pour plus de variété
+# 3. Logique de Scoring avec Facteur d'Égalisation
+# --- LOGIQUE SCORING (10 QUESTIONS) ---
+
 LOGIQUE_SCORING = {
-    # Q1 : Ambiance - Ajout de critères secondaires pour diversifier
-    'Paisible & proche de la nature': ['Norm_Surface_Verte_m2', 'Norm_Bruit', 'Norm_Nb_ParcsEnfants', 'Norm_Nb_ComplexesSportifs'],
-    'Calme mais avec un peu de vie': ['Norm_Bruit', 'Norm_Nb_Commerces', 'Norm_Nb_Restaurants', 'Norm_Nb_Pharmacies'],
-    'Urbain & dynamique': ['Norm_Nb_Commerces', 'Norm_Nb_Restaurants', 'Norm_Nb_Bars', 'Norm_Nb_Transports', 'Norm_Nb_VLille'],
-    'Très animé (bars, sorties, nightlife)': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants', 'Norm_Nb_Transports', 'Norm_Nb_VLille'],
+    
+    # =================================================================
+    # Q1 : MON AMBIANCE DE QUARTIER IDÉALE
+    # =================================================================
+    'Très animé (nightlife)': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants', 'Norm_Nb_Transports'],
+    'Urbain & dynamique': ['Norm_Nb_Commerces', 'Norm_Nb_Restaurants', 'Norm_Prox_Densite_Commerces', 'Norm_Nb_VLille'],
+    'Calme avec commerces': ['Norm_Bruit', 'Norm_Nb_Commerces', 'Norm_Nb_Pharmacies', 'Norm_Equilibre_Global'],
+    'Paisible & résidentiel': ['Norm_Bruit', 'Norm_Surface_Verte_m2', 'Norm_Nb_ParcsEnfants', 'Norm_Prox_Ratio_EspacesVerts'],
 
-    # Q2 : Déplacement - Enrichissement des critères
-    'Transports en commun': ['Norm_Nb_Transports', 'Norm_Nb_VLille', 'Norm_Nb_Commerces'],
-    'Vélo / V\'Lille': ['Norm_Nb_VLille', 'Norm_Nb_Transports', 'Norm_Nb_ComplexesSportifs'],
-    'Voiture': ['Norm_Nb_Parkings', 'Norm_Nb_Commerces'],
-    'À pied': ['Norm_Nb_Commerces', 'Norm_Nb_Restaurants', 'Norm_Nb_Pharmacies'],
+    # =================================================================
+    # Q2 : MON NIVEAU DE FLEXIBILITÉ BUDGÉTAIRE
+    # =================================================================
+    'Très serré': ['Norm_Prix', 'Norm_Nb_Transports'],
+    'Modéré': ['Norm_Prix', 'Norm_Nb_Commerces', 'Norm_Equilibre_Global'],
+    'Confortable': ['Norm_Prix', 'Norm_Nb_Restaurants', 'Norm_Nb_Parkings'],
+    'Flexible': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants', 'Norm_Nb_ComplexesSportifs'], # Norm_Prix est ignoré
 
-    # Q3 : Bruit - Diversification
-    'Très sensible': ['Norm_Bruit', 'Norm_Surface_Verte_m2'],
+    # =================================================================
+    # Q3 : MON EXIGENCE EN PROXIMITÉ DES SERVICES
+    # =================================================================
+    'Services médicaux (Pharmacie/Santé)': ['Norm_Nb_Pharmacies', 'Norm_Nb_Commerces', 'Norm_Bruit'],
+    'Hypermarchés': ['Norm_Nb_Commerces', 'Norm_Nb_Parkings', 'Norm_Prox_Densite_Commerces'],
+    'Restauration': ['Norm_Nb_Restaurants', 'Norm_Nb_Bars', 'Norm_Prox_Densite_Commerces'],
+    'Hyper-proximité totale (tout à pied)': ['Norm_Prox_Densite_Commerces', 'Norm_Prox_Densite_Transports', 'Norm_Nb_Pharmacies', 'Norm_Equilibre_Global'],
+
+    # =================================================================
+    # Q4 : MON MODE DE DÉPLACEMENT PRINCIPAL
+    # =================================================================
+    'Transports en commun': ['Norm_Nb_Transports', 'Norm_Nb_VLille', 'Norm_Prox_Densite_Transports'],
+    'Vélo': ['Norm_Nb_VLille', 'Norm_Surface_Verte_m2', 'Norm_Nb_ComplexesSportifs'],
+    'Voiture': ['Norm_Nb_Parkings', 'Norm_Nb_Commerces', 'Norm_Bruit'],
+    'Uniquement à pied': ['Norm_Prox_Densite_Commerces', 'Norm_Prox_Densite_Transports', 'Norm_Equilibre_Global'],
+
+    # =================================================================
+    # Q5 : MON BESOIN EN ESPACES VERTS ET NATURE
+    # =================================================================
+    'Essentiel (Nature/Détente)': ['Norm_Prox_Ratio_EspacesVerts', 'Norm_Surface_Verte_m2', 'Norm_Bruit', 'Norm_Nb_ParcsEnfants'],
+    'Juste quelques parcs': ['Norm_Surface_Verte_m2', 'Norm_Nb_ParcsEnfants', 'Norm_Equilibre_Global'],
+    'Pratique pour le sport': ['Norm_Nb_ComplexesSportifs', 'Norm_Prox_Ratio_EspacesVerts', 'Norm_Nb_Transports'],
+    'Peu important': ['Norm_Nb_Transports', 'Norm_Nb_Commerces'],
+
+    # =================================================================
+    # Q6 : MON BESOIN EN INFRASTRUCTURES POUR ENFANTS/FAMILLE
+    # =================================================================
+    'Écoles': ['Norm_Prox_Densite_Ecoles', 'Norm_Nb_Ecoles', 'Norm_Bruit'],
+    'Parcs d\'enfants': ['Norm_Nb_ParcsEnfants', 'Norm_Surface_Verte_m2', 'Norm_Bruit'],
+    'Écoles + Sport': ['Norm_Prox_Densite_Ecoles', 'Norm_Nb_ComplexesSportifs', 'Norm_Prox_Ratio_EspacesVerts'],
+    'Pas pertinent': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants', 'Norm_Nb_Transports'], # Inverse le poids vers non-famille
+
+    # =================================================================
+    # Q7 : MA SENSIBILITÉ AU BRUIT
+    # =================================================================
+    'Extrêmement sensible': ['Norm_Bruit', 'Norm_Surface_Verte_m2', 'Norm_Equilibre_Global'],
     'Un peu sensible': ['Norm_Bruit', 'Norm_Nb_ParcsEnfants'],
-    'Ça m\'est égal': ['Norm_Nb_Commerces'],
-    'J\'aime quand ça bouge': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants'],
+    'Ça m\'est égal': ['Norm_Nb_Commerces', 'Norm_Nb_Transports'],
+    'J\'aime quand ça bouge': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants', 'Norm_Prox_Densite_Transports'],
 
-    # Q4 : Espaces Verts - Critères complémentaires
-    'Pas important': ['Norm_Nb_Transports'],
-    'Un peu important': ['Norm_Surface_Verte_m2', 'Norm_Nb_ParcsEnfants'],
-    'Très important': ['Norm_Surface_Verte_m2', 'Norm_Nb_ParcsEnfants', 'Norm_Nb_ComplexesSportifs'],
-    'Essentiel dans mon quotidien': ['Norm_Surface_Verte_m2', 'Norm_Bruit', 'Norm_Nb_ParcsEnfants', 'Norm_Nb_ComplexesSportifs'],
+    # =================================================================
+    # Q8 : MON PROFIL DE VIE ACTUEL (Statut)
+    # =================================================================
+    'Étudiant': ['Norm_Nb_Transports', 'Norm_Nb_Bars', 'Norm_Prix', 'Norm_Prox_Densite_Transports'],
+    'Actif (Salarié/Indépendant)': ['Norm_Nb_Transports', 'Norm_Nb_Commerces', 'Norm_Nb_Parkings', 'Norm_Equilibre_Global'],
+    'Retraité': ['Norm_Bruit', 'Norm_Nb_Pharmacies', 'Norm_Surface_Verte_m2', 'Norm_Equilibre_Global'],
+    'Famille avec enfants': ['Norm_Prox_Densite_Ecoles', 'Norm_Nb_ParcsEnfants', 'Norm_Bruit', 'Norm_Prox_Ratio_EspacesVerts'],
 
-    # Q5 : Budget Logement - Ajout critères secondaires
-    'Serré': ['Norm_Prix', 'Norm_Nb_Transports'],
-    'Modéré': ['Norm_Prix', 'Norm_Nb_Commerces'],
-    'Confortable': ['Norm_Prix', 'Norm_Nb_Restaurants'],
-    'Flexible': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants'],
+    # =================================================================
+    # Q9 : MON RYTHME DE VIE ET MES HABITUDES
+    # =================================================================
+    'Très tranquille (à la maison)': ['Norm_Bruit', 'Norm_Surface_Verte_m2', 'Norm_Equilibre_Global'],
+    'Sorties fréquentes': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants', 'Norm_Prox_Densite_Transports'],
+    'Fait du sport': ['Norm_Nb_ComplexesSportifs', 'Norm_Nb_VLille', 'Norm_Prox_Ratio_EspacesVerts'],
+    'Cuisiner vs. Manger dehors': ['Norm_Nb_Commerces', 'Norm_Nb_Restaurants', 'Norm_Equilibre_Global'],
 
-    # Q6 : Repas - Enrichissement
-    'Je cuisine souvent': ['Norm_Nb_Commerces', 'Norm_Nb_Pharmacies'],
-    'Je cuisine de temps en temps': ['Norm_Nb_Commerces', 'Norm_Nb_Restaurants'],
-    'Je cuisine rarement': ['Norm_Nb_Restaurants', 'Norm_Nb_Commerces'],
-    'Je mange beaucoup dehors': ['Norm_Nb_Restaurants', 'Norm_Nb_Bars', 'Norm_Nb_Transports'],
-
-    # Q7 : Services - Plus de diversité
-    'Pharmacie': ['Norm_Nb_Pharmacies', 'Norm_Nb_Commerces'],
-    'Commerces / supermarchés': ['Norm_Nb_Commerces', 'Norm_Nb_Transports'],
-    'Restaurants / cafés': ['Norm_Nb_Restaurants', 'Norm_Nb_Bars', 'Norm_Nb_Transports'],
-    'Pas particulièrement': ['Norm_Nb_VLille'],
-
-    # Q8 : Enfants - Critères étendus
-    'Oui': ['Norm_Nb_Ecoles', 'Norm_Nb_ParcsEnfants', 'Norm_Surface_Verte_m2', 'Norm_Nb_ComplexesSportifs', 'Norm_Bruit'],
-    'Pas encore mais bientôt': ['Norm_Nb_Ecoles', 'Norm_Nb_ParcsEnfants', 'Norm_Surface_Verte_m2'],
-    'Non': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants'],
-    'Jamais': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants', 'Norm_Nb_Transports'],
-
-    # Q9 : Sécurité / Tranquillité - Plus de nuances
-    'Très important': ['Norm_Bruit', 'Norm_Nb_ParcsEnfants', 'Norm_Surface_Verte_m2'],
-    'Assez important': ['Norm_Bruit', 'Norm_Nb_ParcsEnfants'],
-    'Peu important': ['Norm_Nb_Bars'],
-    'Pas vraiment': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants'],
-
-    # Q10 : Rythme de vie - Diversification accrue
-    'Plutôt tranquille': ['Norm_Bruit', 'Norm_Surface_Verte_m2', 'Norm_Nb_ParcsEnfants'],
-    'Relax & chill': ['Norm_Nb_Commerces', 'Norm_Nb_Restaurants', 'Norm_Surface_Verte_m2'],
-    'Dynamique': ['Norm_Nb_Restaurants', 'Norm_Nb_Commerces', 'Norm_Nb_Transports', 'Norm_Nb_VLille'],
-    'Très actif / je sors souvent': ['Norm_Nb_Bars', 'Norm_Nb_Restaurants', 'Norm_Nb_Transports', 'Norm_Nb_VLille'],
+    # =================================================================
+    # Q10 : MON CRITÈRE DE QUALITÉ DE VIE ABSOLU
+    # =================================================================
+    'Uniquement la performance globale (Équilibre)': ['Norm_Equilibre_Global', 'Norm_Prix', 'Norm_Bruit'],
+    'Le meilleur prix': ['Norm_Prix', 'Norm_Nb_Transports', 'Norm_Nb_Commerces'],
+    'Le moins de bruit': ['Norm_Bruit', 'Norm_Surface_Verte_m2', 'Norm_Equilibre_Global'],
+    'L\'hyper-proximité': ['Norm_Prox_Densite_Commerces', 'Norm_Prox_Densite_Transports', 'Norm_Nb_Pharmacies'],
 }
 
-
 # --------------------------------------------------------------------------
-# --- II. CHARGEMENT SÉCURISÉ DES DONNÉES ---
+# --- II. CHARGEMENT SÉCURISÉ DES DONNÉES (MISE À JOUR) ---
 # --------------------------------------------------------------------------
 
 def charger_matrice():
-    """Charge la matrice de données depuis Excel"""
+    """Charge la matrice de données et calcule le Facteur d'Égalisation."""
     try:
         df = pd.read_excel(FICHIER_MATRICE, sheet_name=NOM_FEUILLE)
         
@@ -100,15 +129,34 @@ def charger_matrice():
             print("❌ ERREUR : La colonne 'NOM_IRIS' est manquante.")
             return None
         
-        if df.empty:
-            print("❌ ERREUR : La feuille Excel est vide.")
-            return None
+        # 1. Identifier toutes les colonnes normalisées (Norm_) et de proximité (Prox_)
+        colonnes_a_inclure = [
+            col for col in df.columns 
+            if col.startswith('Norm_') or col.startswith('Prox_')
+        ]
         
-        # Nettoyage
-        cols_norm = [col for col in df.columns if col.startswith('Norm_')]
-        df[cols_norm] = df[cols_norm].fillna(0.0)
+        # S'assurer que les colonnes de prix normalisé et bruit sont incluses (car elles peuvent avoir un préfixe différent si non 'Norm_')
+        # Nous allons nous baser sur TOUS_LES_CRITERES_NORMALISES pour la robustesse
         
-        print(f"✅ Matrice chargée avec {df.shape[0]} lignes.")
+        # 2. Calcul du Facteur d'Égalisation (Moyenne des scores normalisés)
+        # On ne prend que les colonnes qui existent dans le DF
+        colonnes_existantes = [col for col in TOUS_LES_CRITERES_NORMALISES if col in df.columns and col != CRITERE_EGALISATION]
+        
+        if colonnes_existantes:
+             # Calcule la moyenne des scores normalisés pour chaque ligne (IRIS)
+             df[CRITERE_EGALISATION] = df[colonnes_existantes].mean(axis=1)
+             print(f"✅ Ajout du critère d'égalisation '{CRITERE_EGALISATION}'.")
+        else:
+             print("⚠️ Avertissement : Impossible de calculer le Facteur d'Égalisation (colonnes normalisées manquantes).")
+             df[CRITERE_EGALISATION] = 0.5
+
+
+        # 3. Nettoyage final
+        # Inclure le nouveau critère d'égalisation dans le nettoyage
+        cols_for_cleanup = colonnes_a_inclure + [CRITERE_EGALISATION]
+        df[cols_for_cleanup] = df[cols_for_cleanup].fillna(0.0)
+        
+        print(f"✅ Matrice chargée avec {df.shape[0]} lignes depuis la feuille '{NOM_FEUILLE}'.")
         return df
         
     except Exception as e:
@@ -117,57 +165,56 @@ def charger_matrice():
 
 
 # --------------------------------------------------------------------------
-# --- III. FONCTIONS DE SCORING ---
+# --- III. FONCTIONS DE SCORING (Inchangé) ---
 # --------------------------------------------------------------------------
+# Les fonctions consolider_poids_utilisateur et recommander_quartiers ne nécessitent 
+# pas de modification car elles gèrent la liste TOUS_LES_CRITERES_NORMALISES mise à jour.
+
+# --- NOUVELLE CONFIGURATION GLOBALE ---
+# Facteur d'amplification pour l'équilibre (pour le tester plus fortement)
+FACTEUR_AMPLIFICATION_EQUILIBRE = 3
+CRITERE_EGALISATION = 'Norm_Equilibre_Global'
+# -------------------------------------
 
 def consolider_poids_utilisateur(reponses_dict):
     """
-    Traduit les réponses utilisateur en poids pour chaque critère.
-    reponses_dict: {0: {'option': 'Paisible & proche de la nature', 'poids': 1}, ...}
-    Le poids (1-4) représente le niveau d'intérêt de l'utilisateur.
+    Traduit les réponses utilisateur en poids pour chaque critère,
+    en appliquant une amplification uniquement au Facteur d'Égalisation.
     """
     poids_finaux = {col: 0 for col in TOUS_LES_CRITERES_NORMALISES}
     
-    for question_idx, reponse_data in reponses_dict.items():
-        # Extraire l'option et le niveau d'intérêt (poids du bouton)
-        if isinstance(reponse_data, dict):
-            option_choisie = reponse_data.get('option', '')
-            niveau_interet = reponse_data.get('poids', 0)  # 1=😐, 2=🙂, 3=😊, 4=🤩
-        else:
+    for reponse_data in reponses_dict.values():
+        if not isinstance(reponse_data, dict):
             continue
+            
+        option_choisie = reponse_data.get('option', '')
+        niveau_interet = reponse_data.get('poids', 0) 
+        poids_a_ajouter = niveau_interet
         
         if niveau_interet == 0:
             continue
-        
-        # Déterminer si c'est une question budget
-        is_budget = 'Serré' in option_choisie or 'Modéré' in option_choisie or 'Confortable' in option_choisie
-        
-        # Récupérer les critères à renforcer pour cette option
-        if option_choisie and option_choisie in LOGIQUE_SCORING:
+            
+        if 'Flexible' in option_choisie:
+            pass 
+
+        if option_choisie in LOGIQUE_SCORING:
             criteres_renforces = LOGIQUE_SCORING[option_choisie]
             
-            for idx, critere in enumerate(criteres_renforces):
+            for critere in criteres_renforces:
                 if critere in poids_finaux:
-                    # Pour le budget, SEUL le critère Norm_Prix reçoit le boost ×4
-                    if is_budget and critere == 'Norm_Prix':
-                        poids_finaux[critere] += niveau_interet * 4
-                    # Les autres critères reçoivent le poids normal
-                    else:
-                        poids_finaux[critere] += niveau_interet
-        
-        # Cas spécial "Flexible" : pas de contrainte budget
-        if 'Flexible' in option_choisie:
-            # Remettre Norm_Prix à 0 s'il avait été ajouté
-            if 'Norm_Prix' in poids_finaux:
-                poids_finaux['Norm_Prix'] = 0
+                    poids = poids_a_ajouter
+                    
+                    # AMPLIFICATION CIBLÉE SUR LE FACTEUR D'ÉGALISATION
+                    if critere == CRITERE_EGALISATION:
+                        poids *= FACTEUR_AMPLIFICATION_EQUILIBRE
+                    
+                    poids_finaux[critere] += poids
     
     return poids_finaux
 
 
 def recommander_quartiers(poids_finaux_consolides, matrice_data, n_recommandations=5):
-    """
-    Calcule les scores de correspondance et retourne les meilleurs quartiers.
-    """
+    # ... (inchangé)
     if matrice_data is None or matrice_data.empty:
         return None
     
