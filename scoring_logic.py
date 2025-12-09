@@ -132,31 +132,34 @@ def consolider_poids_utilisateur(reponses_dict):
         # Extraire l'option et le niveau d'intérêt (poids du bouton)
         if isinstance(reponse_data, dict):
             option_choisie = reponse_data.get('option', '')
-            niveau_interet = reponse_data.get('poids', 0)  # 1=😤, 2=😕, 3=😊, 4=🤩
+            niveau_interet = reponse_data.get('poids', 0)  # 1=😐, 2=🙂, 3=😊, 4=🤩
         else:
             continue
         
         if niveau_interet == 0:
             continue
         
-        # Le poids à ajouter est directement le niveau d'intérêt du bouton
-        poids_a_ajouter = niveau_interet
-        
-        # Logique spécifique pour Q5 (Budget)
-        # L'algorithme original applique le niveau d'intérêt différemment pour le budget
-        # Serré + Très intéressé = poids maximal, etc.
-        # MAIS on ne change PAS le poids ici, on le garde tel quel
-        # La seule exception est si l'option est "Flexible" -> poids = 0
-        if 'Flexible' in option_choisie:
-            poids_a_ajouter = 0
+        # Déterminer si c'est une question budget
+        is_budget = 'Serré' in option_choisie or 'Modéré' in option_choisie or 'Confortable' in option_choisie
         
         # Récupérer les critères à renforcer pour cette option
         if option_choisie and option_choisie in LOGIQUE_SCORING:
             criteres_renforces = LOGIQUE_SCORING[option_choisie]
             
-            for critere in criteres_renforces:
+            for idx, critere in enumerate(criteres_renforces):
                 if critere in poids_finaux:
-                    poids_finaux[critere] += poids_a_ajouter
+                    # Pour le budget, SEUL le critère Norm_Prix reçoit le boost ×3
+                    if is_budget and critere == 'Norm_Prix':
+                        poids_finaux[critere] += niveau_interet * 3
+                    # Les autres critères reçoivent le poids normal
+                    else:
+                        poids_finaux[critere] += niveau_interet
+        
+        # Cas spécial "Flexible" : pas de contrainte budget
+        if 'Flexible' in option_choisie:
+            # Remettre Norm_Prix à 0 s'il avait été ajouté
+            if 'Norm_Prix' in poids_finaux:
+                poids_finaux['Norm_Prix'] = 0
     
     return poids_finaux
 

@@ -1296,29 +1296,30 @@ else:
                     total_poids = sum(poids.values())
                     
                     if total_poids > 0:
-                        # Récupérer tous les critères avec poids > 0
+                        # Récupérer TOUS les critères (pas seulement ceux avec poids > 0)
                         criteres_importants = []
                         # Trouver le poids max pour normaliser
                         poids_max = max(poids.values()) if poids.values() else 1
                         
                         for critere, poids_critere in poids.items():
-                            if poids_critere > 0 and critere in quartier_row.columns:
+                            if critere in quartier_row.columns:
                                 valeur_zone = quartier_row.iloc[0][critere] * 100
                                 # Normaliser le poids sur 100 (0 = pas important, 100 = très important)
-                                importance = (poids_critere / poids_max) * 100
+                                importance = (poids_critere / poids_max) * 100 if poids_critere > 0 else 0
                                 nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
                                 criteres_importants.append({
                                     'nom': nom_francais,
                                     'attente': importance,
                                     'zone': valeur_zone,
-                                    'ecart': valeur_zone - importance
+                                    'ecart': valeur_zone - importance,
+                                    'poids_brut': poids_critere  # Pour le tri
                                 })
                         
-                        # Trier par importance décroissante
-                        criteres_importants.sort(key=lambda x: x['attente'], reverse=True)
+                        # Trier par poids brut décroissant (critères les plus importants en premier)
+                        criteres_importants.sort(key=lambda x: x['poids_brut'], reverse=True)
                         
-                        # Afficher le graphique de comparaison
-                        for critere in criteres_importants:
+                        # Afficher le graphique de comparaison (seulement top 10 pour ne pas surcharger)
+                        for critere in criteres_importants[:10]:
                             if critere['ecart'] > 20:
                                 match_color = "#10b981"
                                 match_text = "✅ Excellent"
