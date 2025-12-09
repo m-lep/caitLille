@@ -1112,28 +1112,53 @@ else:
         tiles="CartoDB positron",
     )
 
-    # Fonction pour générer une couleur basée sur un score normalisé (0-100)
+    # Fonction pour générer une couleur basée sur un score normalisé (0-100) avec plus de nuances
     def get_color_from_score(score, min_score, max_score):
-        """Normalise le score entre min et max, puis génère la couleur"""
+        """Normalise le score entre min et max, puis génère la couleur avec gradient riche"""
         # Normaliser le score entre 0 et 100
         if max_score > min_score:
             normalized = ((score - min_score) / (max_score - min_score)) * 100
         else:
             normalized = 50  # Si tous les scores sont identiques
         
-        # Générer la couleur : rouge (0) -> jaune (50) -> vert (100)
-        if normalized < 50:
-            # Rouge à Jaune (0-50)
-            ratio = normalized / 50
-            r = 255
-            g = int(255 * ratio)  # 0 à 255
+        # Gradient avec plus de nuances : Rouge -> Orange -> Jaune -> Jaune-vert -> Vert -> Vert foncé
+        if normalized < 20:
+            # Rouge foncé à Rouge (0-20)
+            ratio = normalized / 20
+            r = int(139 + (255 - 139) * ratio)  # 139 à 255
+            g = 0
             b = 0
-        else:
-            # Jaune à Vert (50-100)
-            ratio = (normalized - 50) / 50
+        elif normalized < 40:
+            # Rouge à Orange (20-40)
+            ratio = (normalized - 20) / 20
+            r = 255
+            g = int(140 * ratio)  # 0 à 140
+            b = 0
+        elif normalized < 60:
+            # Orange à Jaune (40-60)
+            ratio = (normalized - 40) / 20
+            r = 255
+            g = int(140 + (255 - 140) * ratio)  # 140 à 255
+            b = 0
+        elif normalized < 75:
+            # Jaune à Jaune-vert (60-75)
+            ratio = (normalized - 60) / 15
             r = int(255 * (1 - ratio))  # 255 à 0
             g = 255
-            b = 0
+            b = int(50 * ratio)  # 0 à 50
+        elif normalized < 90:
+            # Jaune-vert à Vert (75-90)
+            ratio = (normalized - 75) / 15
+            r = 0
+            g = 255
+            b = int(50 + (100 * ratio))  # 50 à 150
+        else:
+            # Vert à Vert foncé (90-100)
+            ratio = (normalized - 90) / 10
+            r = 0
+            g = int(255 - (100 * ratio))  # 255 à 155
+            b = int(150 - (50 * ratio))  # 150 à 100
+        
         return f"#{r:02x}{g:02x}{b:02x}"
     
     # Créer des dictionnaires de scores par CODE_IRIS et NOM_IRIS
@@ -1204,17 +1229,17 @@ else:
             },
             style_function=lambda x, current_color=color: {
                 "fillColor": current_color,
-                "color": "#d63d42",
-                "weight": 1.5,
-                "opacity": 0.8,
-                "fillOpacity": 0.6,
+                "color": "#ffffff",  # Bordure blanche pour plus de contraste
+                "weight": 1.2,
+                "opacity": 0.7,
+                "fillOpacity": 0.45,  # Opacité réduite pour plus de beauté
             },
             highlight_function=lambda x, current_color=color: {
                 "fillColor": current_color,
-                "color": "#ff5a5f",
-                "weight": 3,
+                "color": "#ff5a5f",  # Bordure rouge au survol
+                "weight": 2.5,
                 "opacity": 1,
-                "fillOpacity": 0.8,
+                "fillOpacity": 0.75,  # Plus opaque au survol
             },
             tooltip=folium.Tooltip(
                 f'<div style="background-color: {color}; color: white; font-weight: bold; border: none; padding: 4px 8px; border-radius: 4px;">Score: {score:.0f}</div>',
