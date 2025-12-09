@@ -28,101 +28,104 @@ st.set_page_config(
 # Données (template)
 # -----------------------
 
+# -----------------------
+# Données (NOUVEAU Questionnaire 10 Questions)
+# -----------------------
+
 PLACES = [
     {
-        "name": "Q1 : Ambiance de quartier",
+        "name": "Q1 : Ambiance de Quartier Idéale",
         "emoji": "🏘️",
-        "vibe": "Quel type d'ambiance ?",
-        "tags": ["ambiance", "environnement", "style de vie"],
+        "vibe": "Urbain, Nature, Calme, Fête ?",
+        "tags": ["ambiance", "bruit", "nature"],
         "description": "Quelle ambiance de quartier te correspond le mieux ?",
         "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Paisible & proche de la nature", "Calme mais avec un peu de vie", "Urbain & dynamique", "Très animé (bars, sorties, nightlife)"]
+        "options": ["Très animé (nightlife)", "Urbain & dynamique", "Calme avec commerces", "Paisible & résidentiel"]
     },
     {
-        "name": "Q2 : Mode de déplacement",
-        "emoji": "🚴",
-        "vibe": "Comment te déplaces-tu ?",
-        "tags": ["transport", "mobilité", "déplacement"],
-        "description": "Quel est ton principal mode de déplacement au quotidien ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Transports en commun", "Vélo / V'Lille", "Voiture", "À pied"]
-    },
-    {
-        "name": "Q3 : Sensibilité au bruit",
-        "emoji": "🔇",
-        "vibe": "Le bruit te dérange ?",
-        "tags": ["bruit", "calme", "nuisances"],
-        "description": "Quelle est ta sensibilité au bruit environnant ?",
-        "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Très sensible", "Un peu sensible", "Ça m'est égal", "J'aime quand ça bouge"]
-    },
-    {
-        "name": "Q4 : Importance des espaces verts",
-        "emoji": "🌳",
-        "vibe": "Nature à proximité ?",
-        "tags": ["parcs", "nature", "espaces verts"],
-        "description": "Quelle importance accordes-tu aux espaces verts et parcs ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Pas important", "Un peu important", "Très important", "Essentiel dans mon quotidien"]
-    },
-    {
-        "name": "Q5 : Budget logement",
+        "name": "Q2 : Flexibilité Budgétaire",
         "emoji": "💰",
-        "vibe": "Quel est ton budget ?",
+        "vibe": "Quel est ton budget logement ?",
         "tags": ["prix", "budget", "loyer"],
         "description": "Quel budget peux-tu consacrer à ton logement ?",
-        "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Serré", "Modéré", "Confortable", "Flexible"]
+        "image": "https://uploads.lebonbonfr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Très serré", "Modéré", "Confortable", "Flexible"]
     },
     {
-        "name": "Q6 : Habitudes alimentaires",
-        "emoji": "🍽️",
-        "vibe": "Comment manges-tu ?",
-        "tags": ["cuisine", "restaurants", "alimentation"],
-        "description": "Quelles sont tes habitudes pour les repas ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Je cuisine souvent", "Je cuisine de temps en temps", "Je cuisine rarement", "Je mange beaucoup dehors"]
-    },
-    {
-        "name": "Q7 : Services de proximité",
+        "name": "Q3 : Exigence en Proximité des Services",
         "emoji": "🏪",
-        "vibe": "Services essentiels ?",
-        "tags": ["commerces", "services", "proximité"],
-        "description": "Quels services sont importants pour toi à proximité ?",
-        "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Pharmacie", "Commerces / supermarchés", "Restaurants / cafés", "Pas particulièrement"]
+        "vibe": "Tout doit être accessible à pied ?",
+        "tags": ["commerces", "services", "santé", "proximité"],
+        "description": "Quels services sont importants pour toi à proximité immédiate ?",
+        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Services médicaux (Pharmacie/Santé)", "Hypermarchés", "Restauration", "Hyper-proximité totale (tout à pied)"]
     },
     {
-        "name": "Q8 : Enfants",
+        "name": "Q4 : Mode de Déplacement Principal",
+        "emoji": "🚲",
+        "vibe": "Comment te déplaces-tu au quotidien ?",
+        "tags": ["transport", "mobilité", "voiture", "vélo"],
+        "description": "Quel est ton principal mode de déplacement au quotidien ?",
+        "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Transports en commun", "Vélo / V'Lille", "Voiture", "Uniquement à pied"]
+    },
+    {
+        "name": "Q5 : Besoin en Espaces Verts et Nature",
+        "emoji": "🌳",
+        "vibe": "Importance de la nature ?",
+        "tags": ["parcs", "nature", "sport"],
+        "description": "Quelle est l'importance des espaces verts et de la nature à proximité ?",
+        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Essentiel (Nature/Détente)", "Juste quelques parcs", "Pratique pour le sport", "Peu important"]
+    },
+    {
+        "name": "Q6 : Infrastructures pour Enfants/Famille",
         "emoji": "👶",
-        "vibe": "As-tu des enfants ?",
+        "vibe": "Écoles, parcs, sport ?",
         "tags": ["famille", "enfants", "écoles"],
-        "description": "As-tu des enfants ou prévois-tu d'en avoir ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Oui", "Pas encore mais bientôt", "Non", "Jamais"]
-    },
-    {
-        "name": "Q9 : Sécurité et tranquillité",
-        "emoji": "🔒",
-        "vibe": "Sécurité importante ?",
-        "tags": ["sécurité", "tranquillité", "calme"],
-        "description": "Quelle importance pour la sécurité et la tranquillité ?",
+        "description": "Quel est ton besoin en infrastructures pour enfants/famille ?",
         "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Très important", "Assez important", "Peu important", "Pas vraiment"]
+        "options": ["Écoles", "Parcs d'enfants", "Écoles + Sport", "Pas pertinent"]
     },
     {
-        "name": "Q10 : Rythme de vie",
-        "emoji": "⚡",
-        "vibe": "Quel est ton rythme ?",
-        "tags": ["rythme", "lifestyle", "activité"],
-        "description": "Quel est ton rythme de vie au quotidien ?",
+        "name": "Q7 : Sensibilité au Bruit",
+        "emoji": "🔇",
+        "vibe": "Quelle est ta tolérance au bruit ?",
+        "tags": ["bruit", "calme", "nuisances"],
+        "description": "Quelle est ta sensibilité au bruit environnant ?",
         "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "options": ["Plutôt tranquille", "Relax & chill", "Dynamique", "Très actif / je sors souvent"]
+        "options": ["Extrêmement sensible", "Un peu sensible", "Ça m'est égal", "J'aime quand ça bouge"]
+    },
+    {
+        "name": "Q8 : Profil de Vie Actuel (Statut)",
+        "emoji": "👤",
+        "vibe": "Ton statut personnel ?",
+        "tags": ["étudiant", "actif", "retraité", "famille"],
+        "description": "Quel est ton profil de vie actuel ?",
+        "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Étudiant", "Actif (Salarié/Indépendant)", "Retraité", "Famille avec enfants"]
+    },
+    {
+        "name": "Q9 : Rythme de Vie et Habitudes",
+        "emoji": "⚡",
+        "vibe": "Activité et sorties ?",
+        "tags": ["lifestyle", "sport", "sorties"],
+        "description": "Quel est ton rythme de vie et tes habitudes (sorties, sport) ?",
+        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Très tranquille (à la maison)", "Sorties fréquentes", "Fait du sport", "Cuisiner vs. Manger dehors"]
+    },
+    {
+        "name": "Q10 : Critère de Qualité de Vie Absolu",
+        "emoji": "🥇",
+        "vibe": "Ton critère non négociable ?",
+        "tags": ["non-négociable", "qualité", "équilibre"],
+        "description": "Quel est le critère qui prime sur tous les autres ?",
+        "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+        "options": ["Uniquement la performance globale (Équilibre)", "Le meilleur prix", "Le moins de bruit", "L'hyper-proximité"]
     },
 ]
 
 TOTAL = len(PLACES)
-
 
 # -----------------------
 # Styles globaux - Tinder Design + iOS
