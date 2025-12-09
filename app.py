@@ -1073,23 +1073,23 @@ else:
         st.markdown("### 🏆 Vos meilleurs quartiers :")
         for idx, row in st.session_state.top_quartiers.iterrows():
             score_color = "#10b981" if row['Score_Max'] > 60 else "#ff5a5f" if row['Score_Max'] < 40 else "#fbbf24"
-            st.markdown(
-                f"""
-                <div style="background: white; padding: 16px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid {score_color};">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h3 style="margin: 0; color: #121212; font-size: 18px;">🏘️ {row['NOM_IRIS']}</h3>
-                            <p style="margin: 4px 0 0 0; color: #6c6c6c; font-size: 14px;">Score de compatibilité</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 32px; font-weight: bold; color: {score_color};">{row['Score_Max']:.0f}</div>
-                            <div style="font-size: 12px; color: #6c6c6c;">/100</div>
-                        </div>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            
+            # Bouton cliquable pour scroller vers la carte
+            if st.button(f"🏘️ {row['NOM_IRIS']} - Score: {row['Score_Max']:.0f}/100", 
+                        key=f"scroll_to_map_{row['NOM_IRIS']}", 
+                        use_container_width=True):
+                st.session_state.selected_quartier = row['NOM_IRIS']
+                # JavaScript pour scroller vers la carte
+                st.markdown(
+                    f"""
+                    <script>
+                        setTimeout(function() {{
+                            document.getElementById('carte-interactive').scrollIntoView({{behavior: 'smooth', block: 'start'}});
+                        }}, 100);
+                    </script>
+                    """,
+                    unsafe_allow_html=True
+                )
         
         st.markdown("---")
         
@@ -1099,6 +1099,8 @@ else:
         st.warning("⚠️ Aucune recommandation n'a pu être calculée.")
 
     # Quiz terminé - Afficher la carte IRIS de Lille
+    st.markdown('<div id="carte-interactive"></div>', unsafe_allow_html=True)
+    st.markdown("### 🗺️ Carte interactive de Lille")
 
     # Charger le GeoJSON
     with open("iris_v2_Lille.geojson") as f:
@@ -1315,7 +1317,20 @@ else:
         code_iris_selected = st.session_state.selected_quartier
         nom_iris_geo = st.session_state.selected_quartier_nom or "Zone"
 
+        st.markdown('<div id="details-quartier"></div>', unsafe_allow_html=True)
         st.markdown("---")
+        
+        # JavaScript pour scroller vers les détails
+        st.markdown(
+            """
+            <script>
+                setTimeout(function() {
+                    document.getElementById('details-quartier').scrollIntoView({behavior: 'smooth', block: 'start'});
+                }, 100);
+            </script>
+            """,
+            unsafe_allow_html=True
+        )
         
         # Récupérer les données de l'IRIS depuis la matrice en utilisant CODE_IRIS
         if st.session_state.matrice_data is not None:
@@ -1400,25 +1415,25 @@ else:
                     # D'abord traiter les critères avec poids (priorités utilisateur)
                     for critere, poids_critere in poids.items():
                         if poids_critere > 0 and critere in quartier_row.columns:
-                                nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
-                                valeur_zone = quartier_row.iloc[0][critere] * 100
-                                
-                                # Si ce critère fait partie d'un regroupement
-                                if nom_francais in criteres_groupes:
-                                    # Ajouter au groupe existant (moyenne des valeurs)
-                                    criteres_groupes[nom_francais]['poids_brut'] += poids_critere
-                                    criteres_groupes[nom_francais]['valeur_zone'] = (
-                                        criteres_groupes[nom_francais]['valeur_zone'] + valeur_zone
-                                    ) / 2
-                                    criteres_groupes[nom_francais]['count'] += 1
-                                else:
-                                    # Nouveau critère
-                                    criteres_groupes[nom_francais] = {
-                                        'nom': nom_francais,
-                                        'poids_brut': poids_critere,
-                                        'valeur_zone': valeur_zone,
-                                        'count': 1
-                                    }
+                            nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
+                            valeur_zone = quartier_row.iloc[0][critere] * 100
+                            
+                            # Si ce critère fait partie d'un regroupement
+                            if nom_francais in criteres_groupes:
+                                # Ajouter au groupe existant (moyenne des valeurs)
+                                criteres_groupes[nom_francais]['poids_brut'] += poids_critere
+                                criteres_groupes[nom_francais]['valeur_zone'] = (
+                                    criteres_groupes[nom_francais]['valeur_zone'] + valeur_zone
+                                ) / 2
+                                criteres_groupes[nom_francais]['count'] += 1
+                            else:
+                                # Nouveau critère
+                                criteres_groupes[nom_francais] = {
+                                    'nom': nom_francais,
+                                    'poids_brut': poids_critere,
+                                    'valeur_zone': valeur_zone,
+                                    'count': 1
+                                }
                         
                     # Ajouter les critères non-priorisés (mais présents dans les données)
                     for critere, label in traductions.items():
@@ -1441,13 +1456,13 @@ else:
                         importance = (data['poids_brut'] / poids_max) * 100 if poids_max > 0 else 0
                         criteres_importants.append({
                             'nom': nom,
-                                'attente': importance,
-                                'zone': data['valeur_zone'],
-                                'ecart': data['valeur_zone'] - importance,
-                                'poids_brut': data['poids_brut']
-                            })
-                        
-                        # Trier par priorité utilisateur (attente) décroissante
+                            'attente': importance,
+                            'zone': data['valeur_zone'],
+                            'ecart': data['valeur_zone'] - importance,
+                            'poids_brut': data['poids_brut']
+                        })
+                    
+                    # Trier par priorité utilisateur (attente) décroissante
                         criteres_importants.sort(key=lambda x: x['attente'], reverse=True)
                         
                         # Afficher détails budget si c'est un critère important
