@@ -1195,10 +1195,11 @@ else:
                 scores_par_code[code] = scores_par_nom[nom]
     
     # Calculer les scores min/max pour normaliser les couleurs
+    # Le meilleur score devient 100, le pire devient 0 (normalisation relative)
     all_scores = list(scores_par_code.values()) + list(scores_par_nom.values())
     if all_scores:
-        min_score = 0  # Toujours partir de 0
-        max_score = 100  # Toujours normaliser sur 100
+        min_score = min(all_scores)
+        max_score = max(all_scores)
     else:
         min_score = 0
         max_score = 100
