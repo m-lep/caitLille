@@ -4,7 +4,7 @@ NOUVELLES_QUESTIONS = [
         "emoji": "💰",
         "vibe": "Quel est ton budget ?",
         "tags": ["prix", "budget", "loyer"],
-        "description": "CRUCIAL : Quel est ton budget maximum pour te loger ? (prix au m²)",
+        "description": "Quel est ton budget maximum pour te loger ? (prix au m²)",
         "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "budget",
         "options": [
