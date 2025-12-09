@@ -1481,11 +1481,6 @@ else:
                                 """,
                                 unsafe_allow_html=True
                             )
-                                    </div>
-                                </div>
-                                """,
-                                unsafe_allow_html=True
-                            )
                 else:
                     # Si pas de quiz, afficher juste les performances brutes
                     st.caption("_Complétez le quiz pour voir la comparaison avec vos attentes_")
