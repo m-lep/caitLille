@@ -1065,18 +1065,9 @@ if st.session_state.current_index < TOTAL:
 
 else:
     # Fin du quiz - Résultats
-    st.markdown(
-        """
-        <div class="results-container">
-            <div class="results-title">✨ C'est noté !</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
     
     # Afficher un message si le scoring est disponible ou non
     if st.session_state.top_quartiers is not None and not st.session_state.top_quartiers.empty:
-        st.success(f"🎯 **{len(st.session_state.top_quartiers)} quartiers** correspondent à vos préférences !")
         
         # Afficher le top 3 des quartiers avec leurs scores
         st.markdown("### 🏆 Vos meilleurs quartiers :")
@@ -1402,13 +1393,13 @@ else:
                     
                     total_poids = sum(poids.values())
                     
-                    if total_poids > 0:
-                        # Créer un dictionnaire pour les critères regroupés
-                        criteres_groupes = {}
-                        poids_max = max(poids.values()) if poids.values() else 1
-                        
-                        for critere, poids_critere in poids.items():
-                            if poids_critere > 0 and critere in quartier_row.columns:
+                    # Créer un dictionnaire pour TOUS les critères (avec regroupements)
+                    criteres_groupes = {}
+                    poids_max = max(poids.values()) if poids.values() else 1
+                    
+                    # D'abord traiter les critères avec poids (priorités utilisateur)
+                    for critere, poids_critere in poids.items():
+                        if poids_critere > 0 and critere in quartier_row.columns:
                                 nom_francais = traductions.get(critere, critere.replace('Norm_', '').replace('_', ' '))
                                 valeur_zone = quartier_row.iloc[0][critere] * 100
                                 
@@ -1429,15 +1420,27 @@ else:
                                         'count': 1
                                     }
                         
-                        # Convertir en liste et calculer les métriques finales
-                        criteres_importants = []
-                        # Recalculer poids_max après regroupement
-                        poids_max = max(c['poids_brut'] for c in criteres_groupes.values())
-                        
-                        for nom, data in criteres_groupes.items():
-                            importance = (data['poids_brut'] / poids_max) * 100
-                            criteres_importants.append({
-                                'nom': nom,
+                    # Ajouter les critères non-priorisés (mais présents dans les données)
+                    for critere, label in traductions.items():
+                        if critere in quartier_row.columns:
+                            valeur_zone = quartier_row.iloc[0][critere] * 100
+                            if label not in criteres_groupes:
+                                criteres_groupes[label] = {
+                                    'nom': label,
+                                    'poids_brut': 0,  # Pas prioritaire pour l'utilisateur
+                                    'valeur_zone': valeur_zone,
+                                    'count': 1
+                                }
+                    
+                    # Convertir en liste et calculer les métriques finales
+                    criteres_importants = []
+                    # Recalculer poids_max après regroupement
+                    poids_max = max(c['poids_brut'] for c in criteres_groupes.values()) if criteres_groupes.values() else 1
+                    
+                    for nom, data in criteres_groupes.items():
+                        importance = (data['poids_brut'] / poids_max) * 100 if poids_max > 0 else 0
+                        criteres_importants.append({
+                            'nom': nom,
                                 'attente': importance,
                                 'zone': data['valeur_zone'],
                                 'ecart': data['valeur_zone'] - importance,
