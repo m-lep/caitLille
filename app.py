@@ -1054,9 +1054,14 @@ else:
         zoom_control=True,
         scrollWheelZoom=True,
         dragging=True,
-        max_zoom=18,
-        min_zoom=11
+        max_zoom=15,
+        min_zoom=12,
+        max_bounds=True,
+        max_bounds_viscosity=1.0
     )
+    
+    # Limiter la carte à la métropole lilloise
+    m.fit_bounds([[50.55, 3.00], [50.70, 3.20]])
 
     # Fonction pour générer une couleur basée sur un score normalisé (0-100) avec plus de nuances
     def get_color_from_score(score, min_score, max_score):
@@ -1617,8 +1622,13 @@ else:
             font-weight: 600 !important;
             box-shadow: none !important;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            min-height: auto !important;
-            height: auto !important;
+            min-height: 60px !important;
+            height: 60px !important;
+            width: 60px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            white-space: nowrap !important;
         }
         .restart-button-center [data-testid="stButton"] button:hover {
             background: #fff5f5 !important;
