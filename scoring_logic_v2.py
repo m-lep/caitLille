@@ -268,7 +268,12 @@ def recommander_quartiers(poids_finaux_consolides, matrice_data, n_recommandatio
     # Calcul de la Somme Pondérée
     for col_norm, poids in poids_finaux_consolides.items():
         if col_norm in df_reco.columns and poids > 0:
-            df_reco['Score_Correspondance_Total'] += df_reco[col_norm] * poids
+            # INVERSION SPÉCIALE POUR LE PRIX : Norm_Prix=1.0 signifie CHER dans l'Excel
+            # On inverse pour que budget serré favorise les quartiers PAS CHERS
+            if col_norm == 'Norm_Prix':
+                df_reco['Score_Correspondance_Total'] += (1.0 - df_reco[col_norm]) * poids
+            else:
+                df_reco['Score_Correspondance_Total'] += df_reco[col_norm] * poids
     
     # Normalisation sur 100
     df_reco['Score_Final_100'] = (df_reco['Score_Correspondance_Total'] / total_poids_valides) * 100
@@ -314,7 +319,12 @@ def calculer_tous_scores(poids_finaux_consolides, matrice_data):
     # Calcul de la Somme Pondérée
     for col_norm, poids in poids_finaux_consolides.items():
         if col_norm in df_scores.columns and poids > 0:
-            df_scores['Score_Correspondance_Total'] += df_scores[col_norm] * poids
+            # INVERSION SPÉCIALE POUR LE PRIX : Norm_Prix=1.0 signifie CHER dans l'Excel
+            # On inverse pour que budget serré favorise les quartiers PAS CHERS
+            if col_norm == 'Norm_Prix':
+                df_scores['Score_Correspondance_Total'] += (1.0 - df_scores[col_norm]) * poids
+            else:
+                df_scores['Score_Correspondance_Total'] += df_scores[col_norm] * poids
     
     # Normalisation sur 100
     df_scores['Score_Final_100'] = (df_scores['Score_Correspondance_Total'] / total_poids_valides) * 100
