@@ -1197,8 +1197,8 @@ else:
     # Calculer les scores min/max pour normaliser les couleurs
     all_scores = list(scores_par_code.values()) + list(scores_par_nom.values())
     if all_scores:
-        min_score = min(all_scores)
-        max_score = max(all_scores)
+        min_score = 0  # Toujours partir de 0
+        max_score = 100  # Toujours normaliser sur 100
     else:
         min_score = 0
         max_score = 100
@@ -1229,9 +1229,9 @@ else:
             },
             style_function=lambda x, current_color=color: {
                 "fillColor": current_color,
-                "color": "#ffffff",  # Bordure blanche pour plus de contraste
+                "color": "#2d2d2d",  # Bordure noire/gris foncé
                 "weight": 1.2,
-                "opacity": 0.7,
+                "opacity": 0.8,
                 "fillOpacity": 0.45,  # Opacité réduite pour plus de beauté
             },
             highlight_function=lambda x, current_color=color: {
