@@ -780,6 +780,9 @@ if "tous_scores" not in st.session_state:
 if "selected_quartier" not in st.session_state:
     st.session_state.selected_quartier = None
 
+if "selected_quartier_nom" not in st.session_state:
+    st.session_state.selected_quartier_nom = None
+
 
 def next_question():
     """Passe à la question suivante."""
@@ -1217,32 +1220,37 @@ else:
             selected_feature = find_feature_by_point(lon, lat, geojson_data.get("features", []))
             if selected_feature:
                 props = selected_feature.get("properties", {})
-                nom_iris = props.get("nom_iris", "Zone")
+                code_iris = props.get("code_iris", "")
+                nom_iris_geo = props.get("nom_iris", "Zone")
                 # Mettre à jour le quartier sélectionné seulement si c'est un nouveau quartier
-                if st.session_state.selected_quartier != nom_iris:
-                    st.session_state.selected_quartier = nom_iris
+                if st.session_state.selected_quartier != code_iris:
+                    st.session_state.selected_quartier = code_iris
+                    st.session_state.selected_quartier_nom = nom_iris_geo  # Stocker aussi le nom générique
                     st.rerun()
         except Exception:
             pass
 
     # Afficher les détails du quartier sélectionné
     if st.session_state.selected_quartier:
-        nom_iris = st.session_state.selected_quartier
+        code_iris_selected = st.session_state.selected_quartier
+        nom_iris_geo = st.session_state.selected_quartier_nom or "Zone"
 
         st.markdown("---")
-        st.markdown(f"### 📍 {nom_iris}")
         
-        # Récupérer les données de l'IRIS depuis la matrice
+        # Récupérer les données de l'IRIS depuis la matrice en utilisant CODE_IRIS
         if st.session_state.matrice_data is not None:
-            quartier_row = st.session_state.matrice_data[st.session_state.matrice_data['NOM_IRIS'] == nom_iris]
+            # Convertir code_iris en int si nécessaire
+            try:
+                code_iris_int = int(code_iris_selected)
+            except:
+                code_iris_int = code_iris_selected
             
-            # Debug: afficher les infos
-            st.write(f"DEBUG - Nom recherché: '{nom_iris}'")
-            st.write(f"DEBUG - Lignes trouvées: {len(quartier_row)}")
-            if quartier_row.empty:
-                st.write(f"DEBUG - Noms disponibles dans matrice: {st.session_state.matrice_data['NOM_IRIS'].unique()[:10]}")
+            quartier_row = st.session_state.matrice_data[st.session_state.matrice_data['CODE_IRIS'] == code_iris_int]
             
             if not quartier_row.empty:
+                # Récupérer le vrai nom de l'IRIS depuis la matrice
+                nom_iris = quartier_row.iloc[0]['NOM_IRIS']
+                st.markdown(f"### 📍 {nom_iris}")
                 # Afficher le score de compatibilité si le quiz est terminé
                 if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty:
                     quartier_data = st.session_state.tous_scores[st.session_state.tous_scores['NOM_IRIS'] == nom_iris]
