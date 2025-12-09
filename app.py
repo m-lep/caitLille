@@ -666,70 +666,72 @@ st.markdown(
             font-size: 24px;
         }
 
-        /* Bouton 1: Je veux carrément pas (rouge sombre) */
+        /* Bouton 1: Gris neutre */
         .rating-btn-1 {
-            background: #fee4e3;
-            color: #c1261f;
-            border: 1.5px solid #f5a9a3;
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1.5px solid #d1d5db;
         }
 
         .rating-btn-1:hover {
-            background: #fdd2cd;
-            border-color: #ff8a7c;
+            background: #e5e7eb;
+            border-color: #9ca3af;
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(193, 38, 31, 0.2);
+            box-shadow: 0 8px 20px rgba(107, 114, 128, 0.15);
         }
 
         .rating-btn-1:active {
             transform: scale(0.95);
         }
 
-        /* Bouton 2: Je veux pas (orange) */
+        /* Bouton 2: Même gris */
         .rating-btn-2 {
-            background: #ffecd1;
-            color: #d97706;
-            border: 1.5px solid #ffd4a3;
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1.5px solid #d1d5db;
         }
 
         .rating-btn-2:hover {
-            background: #ffd9b3;
-            border-color: #ffb347;
+            background: #e5e7eb;
+            border-color: #9ca3af;
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(217, 119, 6, 0.2);
+            box-shadow: 0 8px 20px rgba(107, 114, 128, 0.15);
         }
 
         .rating-btn-2:active {
             transform: scale(0.95);
         }
 
-        /* Bouton 3: Je veux (vert clair) */
+        /* Bouton 3: Même gris */
         .rating-btn-3 {
-            background: #d4f8d4;
-            color: #16a34a;
-            border: 1.5px solid #a5e6a5;
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1.5px solid #d1d5db;
         }
 
         .rating-btn-3:hover {
-            background: #b8f0b8;
-            border-color: #6ee876;
+            background: #e5e7eb;
+            border-color: #9ca3af;
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.2);
+            box-shadow: 0 8px 20px rgba(107, 114, 128, 0.15);
         }
 
         .rating-btn-3:active {
             transform: scale(0.95);
         }
 
-        /* Bouton 4: Je veux carrément (vert foncé) */
+        /* Bouton 4: Même gris */
         .rating-btn-4 {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1.5px solid #d1d5db;
         }
 
         .rating-btn-4:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
             transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 8px 20px rgba(107, 114, 128, 0.15);
         }
 
         .rating-btn-4:active {
