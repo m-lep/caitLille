@@ -183,10 +183,10 @@ st.markdown(
         }
 
         .block-container {
-            max-width: 440px !important;
+            max-width: 600px !important;
             padding-top: 24px !important;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
+            padding-left: 12px !important;
+            padding-right: 12px !important;
             padding-bottom: 32px !important;
         }
 
@@ -473,12 +473,17 @@ st.markdown(
             font-weight: 600 !important;
         }
 
+        /* Espacement entre colonnes de boutons */
+        [data-testid="stHorizontalBlock"] {
+            gap: 8px !important;
+        }
+
         /* Style des 4 boutons de rating */
         [data-testid="stButton"] button {
             border-radius: 16px !important;
             font-size: 13px !important;
             font-weight: 600 !important;
-            padding: 20px 12px !important;
+            padding: 20px 8px !important;
             border: none !important;
             transition: all 0.2s ease !important;
             min-height: 140px !important;
