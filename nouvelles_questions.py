@@ -8,10 +8,10 @@ NOUVELLES_QUESTIONS = [
         "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "budget",
         "options": [
-            "Serré (< 2000€/m²)",
-            "Modéré (2000-3000€/m²)", 
-            "Confortable (3000-4000€/m²)",
-            "Aucune limite (> 4000€/m²)"
+            {"text": "🪙 Serré (< 2000€/m²)", "value": "Serré (< 2000€/m²)"},
+            {"text": "💵 Modéré (2000-3000€/m²)", "value": "Modéré (2000-3000€/m²)"}, 
+            {"text": "💰 Confortable (3000-4000€/m²)", "value": "Confortable (3000-4000€/m²)"},
+            {"text": "💎 Aucune limite (> 4000€/m²)", "value": "Aucune limite (> 4000€/m²)"}
         ]
     },
     {
@@ -23,10 +23,10 @@ NOUVELLES_QUESTIONS = [
         "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "ambiance",
         "options": [
-            "Très calme, nature et verdure",
-            "Calme avec services de base",
-            "Dynamique et urbain",
-            "Très animé (vie nocturne, bars)"
+            {"text": "🌳 Très calme, nature et verdure", "value": "Très calme, nature et verdure"},
+            {"text": "🏡 Calme avec services de base", "value": "Calme avec services de base"},
+            {"text": "🏙️ Dynamique et urbain", "value": "Dynamique et urbain"},
+            {"text": "🎉 Très animé (vie nocturne, bars)", "value": "Très animé (vie nocturne, bars)"}
         ]
     },
     {
@@ -38,25 +38,25 @@ NOUVELLES_QUESTIONS = [
         "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "mode_vie",
         "options": [
-            "Je cuisine, j'aime le calme",
-            "Équilibré (cuisine + sorties)",
-            "Je sors souvent au resto/bars",
-            "Vie nocturne intense"
+            {"text": "🍳 Je cuisine, j'aime le calme", "value": "Je cuisine, j'aime le calme"},
+            {"text": "⚖️ Équilibré (cuisine + sorties)", "value": "Équilibré (cuisine + sorties)"},
+            {"text": "🍷 Je sors souvent au resto/bars", "value": "Je sors souvent au resto/bars"},
+            {"text": "🌃 Vie nocturne intense", "value": "Vie nocturne intense"}
         ]
     },
     {
-        "name": "Q4 : Enfants",
-        "emoji": "👶",
-        "vibe": "Situation familiale ?",
-        "tags": ["famille", "enfants", "écoles"],
-        "description": "As-tu des enfants ou en veux-tu ?",
+        "name": "Q4 : Statut",
+        "emoji": "👤",
+        "vibe": "Ton profil ?",
+        "tags": ["statut", "profil", "situation"],
+        "description": "Quelle est ta situation actuelle ?",
         "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-        "question_id": "enfants",
+        "question_id": "statut",
         "options": [
-            "Oui, j'ai des enfants",
-            "Bientôt (projet parental)",
-            "Non, pas prévu",
-            "Non, jamais"
+            {"text": "👶 Parent (avec enfants)", "value": "Parent (avec enfants)"},
+            {"text": "🎓 Étudiant(e)", "value": "Étudiant(e)"},
+            {"text": "💼 Jeune actif(ve)", "value": "Jeune actif(ve)"},
+            {"text": "👴 Senior / Retraité(e)", "value": "Senior / Retraité(e)"}
         ]
     },
     {
@@ -68,10 +68,10 @@ NOUVELLES_QUESTIONS = [
         "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "transport",
         "options": [
-            "Transports en commun uniquement",
-            "Vélo / V'Lille",
-            "Voiture personnelle",
-            "Mix voiture + transports"
+            {"text": "🚇 Transports en commun uniquement", "value": "Transports en commun uniquement"},
+            {"text": "🚴 Vélo / V'Lille", "value": "Vélo / V'Lille"},
+            {"text": "🚗 Voiture personnelle", "value": "Voiture personnelle"},
+            {"text": "🚗🚇 Mix voiture + transports", "value": "Mix voiture + transports"}
         ]
     },
     {
@@ -83,10 +83,10 @@ NOUVELLES_QUESTIONS = [
         "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "activite",
         "options": [
-            "Très sportif (besoin d'équipements)",
-            "Sportif occasionnel",
-            "Peu sportif",
-            "Pas du tout"
+            {"text": "🏋️ Très sportif (besoin d'équipements)", "value": "Très sportif (besoin d'équipements)"},
+            {"text": "🏃 Sportif occasionnel", "value": "Sportif occasionnel"},
+            {"text": "🚶 Peu sportif", "value": "Peu sportif"},
+            {"text": "🛋️ Pas du tout", "value": "Pas du tout"}
         ]
     },
 ]

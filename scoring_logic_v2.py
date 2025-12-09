@@ -104,26 +104,30 @@ LOGIQUE_QUESTIONS = {
         }
     },
     
-    # Q4: Enfants
-    'enfants': {
-        'Oui, j\'ai des enfants': {
+    # Q4: Statut
+    'statut': {
+        'Parent (avec enfants)': {
             'FAMILLE': 5,
             'CALME': 3,
             'SERVICES_PROXIMITE': 2,
-            'VIE_ANIMEE': -2,  # Moins important avec enfants
+            'VIE_ANIMEE': -2,
         },
-        'Bientôt (projet parental)': {
-            'FAMILLE': 3,
-            'CALME': 2,
+        'Étudiant(e)': {
+            'VIE_ANIMEE': 4,
+            'TRANSPORTS': 3,
+            'CALME': -2,
+            'FAMILLE': -3,
+        },
+        'Jeune actif(ve)': {
+            'VIE_ANIMEE': 3,
+            'TRANSPORTS': 2,
             'SERVICES_PROXIMITE': 2,
         },
-        'Non, pas prévu': {
-            'VIE_ANIMEE': 2,
+        'Senior / Retraité(e)': {
+            'CALME': 4,
+            'SERVICES_PROXIMITE': 3,
+            'VIE_ANIMEE': -2,
             'TRANSPORTS': 1,
-        },
-        'Non, jamais': {
-            'VIE_ANIMEE': 3,
-            'FAMILLE': -5,  # FORTEMENT décrémenté
         }
     },
     

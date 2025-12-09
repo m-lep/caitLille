@@ -1027,18 +1027,22 @@ if st.session_state.current_index < TOTAL:
     # Boutons avec les options de la question
     if 'options' in place and len(place['options']) >= 4:
         col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            if st.button(f"😐\n{place['options'][0]}", key=f"btn1_{st.session_state.current_index}", use_container_width=True):
-                enregistrer_reponse(place['options'][0])
-        with col2:
-            if st.button(f"🙂\n{place['options'][1]}", key=f"btn2_{st.session_state.current_index}", use_container_width=True):
-                enregistrer_reponse(place['options'][1])
-        with col3:
-            if st.button(f"😊\n{place['options'][2]}", key=f"btn3_{st.session_state.current_index}", use_container_width=True):
-                enregistrer_reponse(place['options'][2])
-        with col4:
-            if st.button(f"🤩\n{place['options'][3]}", key=f"btn4_{st.session_state.current_index}", use_container_width=True):
-                enregistrer_reponse(place['options'][3])
+        
+        # Gérer le format dict {text, value} ou simple string
+        for idx, (col, option) in enumerate(zip([col1, col2, col3, col4], place['options'])):
+            with col:
+                if isinstance(option, dict):
+                    # Nouveau format avec emoji intégré
+                    button_text = option['text']
+                    option_value = option['value']
+                else:
+                    # Ancien format (string simple) - garder compatibilité
+                    emojis = ["😐", "🙂", "😊", "🤩"]
+                    button_text = f"{emojis[idx]}\n{option}"
+                    option_value = option
+                
+                if st.button(button_text, key=f"btn{idx+1}_{st.session_state.current_index}", use_container_width=True):
+                    enregistrer_reponse(option_value)
     else:
         # Fallback si pas d'options
         col1, col2, col3, col4 = st.columns(4)
