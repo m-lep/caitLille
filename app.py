@@ -1628,6 +1628,26 @@ else:
         .restart-button-center [data-testid="stButton"] {
             width: auto !important;
         }
+        .restart-button-center [data-testid="stButton"] button {
+            background: #ffffff !important;
+            color: #121212 !important;
+            border: 2px solid #ffe8e9 !important;
+            font-size: 28px !important;
+            padding: 16px 24px !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            box-shadow: none !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            min-height: auto !important;
+            height: auto !important;
+        }
+        .restart-button-center [data-testid="stButton"] button:hover {
+            background: #fff5f5 !important;
+            border-color: #ff5a5f !important;
+            color: #ff5a5f !important;
+            box-shadow: none !important;
+            transform: scale(1.1) !important;
+        }
         </style>
         <div class="restart-button-center">
         """,
