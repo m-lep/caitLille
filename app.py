@@ -1182,15 +1182,25 @@ else:
 
     # Ajouter les polygones IRIS avec scores calculés ou aléatoires
     for feature in geojson_data['features']:
-        nom_iris = feature['properties'].get('nom_iris', 'N/A')
         code_iris_geo = feature['properties'].get('code_iris', 'N/A')
+        
+        # Récupérer le vrai nom depuis la matrice via CODE_IRIS
+        nom_iris_display = "Quartier inconnu"
+        if st.session_state.matrice_data is not None:
+            try:
+                code_iris_int = int(code_iris_geo)
+                quartier_match = st.session_state.matrice_data[st.session_state.matrice_data['CODE_IRIS'] == code_iris_int]
+                if not quartier_match.empty:
+                    nom_iris_display = quartier_match.iloc[0]['NOM_IRIS']
+            except:
+                pass
         
         # Essayer d'abord par code_iris, puis par nom_iris
         score = None
         if code_iris_geo in scores_par_code:
             score = scores_par_code[code_iris_geo]
-        elif nom_iris in scores_par_nom:
-            score = scores_par_nom[nom_iris]
+        elif nom_iris_display in scores_par_nom:
+            score = scores_par_nom[nom_iris_display]
         else:
             # Mode exploration : score aléatoire
             score = (hash(code_iris_geo) % 100) + 1
@@ -1219,7 +1229,7 @@ else:
                 "fillOpacity": 0.75,  # Plus opaque au survol
             },
             tooltip=folium.Tooltip(
-                f'<div style="background-color: {color}; color: white; font-weight: bold; border: none; padding: 4px 8px; border-radius: 4px;">{nom_iris}</div>',
+                f'<div style="background-color: {color}; color: white; font-weight: bold; border: none; padding: 4px 8px; border-radius: 4px;">{nom_iris_display}</div>',
                 sticky=False
             ),
         ).add_to(m)
