@@ -1219,7 +1219,7 @@ else:
                 "fillOpacity": 0.75,  # Plus opaque au survol
             },
             tooltip=folium.Tooltip(
-                f'<div style="background-color: {color}; color: white; font-weight: bold; border: none; padding: 4px 8px; border-radius: 4px;">Score: {score:.0f}</div>',
+                f'<div style="background-color: {color}; color: white; font-weight: bold; border: none; padding: 4px 8px; border-radius: 4px;">{nom_iris}</div>',
                 sticky=False
             ),
         ).add_to(m)
@@ -1307,30 +1307,26 @@ else:
             if not quartier_row.empty:
                 # Récupérer le vrai nom de l'IRIS depuis la matrice
                 nom_iris = quartier_row.iloc[0]['NOM_IRIS']
-                st.markdown(f"### 📍 {nom_iris}")
-                # Afficher le score de compatibilité si le quiz est terminé
+                # Déterminer la couleur de bordure basée sur le score
+                score_color = "#9ca3af"  # Gris par défaut
                 if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty:
                     quartier_data = st.session_state.tous_scores[st.session_state.tous_scores['NOM_IRIS'] == nom_iris]
                     if not quartier_data.empty:
                         # Gérer les deux formats de colonnes
                         score_col = 'Score_Max' if 'Score_Max' in quartier_data.columns else 'Score_Final_100'
                         score = quartier_data.iloc[0][score_col]
-                        score_color = "#10b981" if score > 60 else "#ff5a5f" if score < 40 else "#fbbf24"
-                        st.markdown(
-                            f"""
-                            <div style="background: white; padding: 16px; border-radius: 12px; margin-bottom: 16px; border-left: 4px solid {score_color};">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                    <h4 style="margin: 0; color: #121212;">💯 Score de compatibilité</h4>
-                                    <div style="font-size: 24px; font-weight: bold; color: {score_color};">{score:.0f}/100</div>
-                                </div>
-                                <p style="color: #6c6c6c; font-size: 14px; margin: 0;">Ce score est calculé en fonction de vos préférences.</p>
-                            </div>
-                            """,
-                            unsafe_allow_html=True
-                        )
+                        # Utiliser la même fonction get_color_from_score que pour la carte
+                        score_color = get_color_from_score(score)
                 
-                # Afficher les performances avec comparaison attentes vs réalité
-                st.markdown("**📊 Compatibilité : Vos attentes vs Cette zone**")
+                # Afficher uniquement le nom du quartier avec bordure colorée
+                st.markdown(
+                    f"""
+                    <div style="background: white; padding: 16px; border-radius: 12px; margin-bottom: 16px; border-left: 6px solid {score_color};">
+                        <h3 style="margin: 0; color: #121212;">📍 {nom_iris}</h3>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
                 
                 # Traductions françaises des critères avec regroupements
                 traductions = {
