@@ -13,15 +13,24 @@ import os
 try:
     from scoring_logic_v2 import charger_matrice, consolider_poids_utilisateur, recommander_quartiers, calculer_tous_scores
     SCORING_DISPONIBLE = True
+    print("✅ Nouveau système de scoring V2 chargé")
 except Exception as e:
-    print(f"⚠️ Système de scoring non disponible: {e}")
-    SCORING_DISPONIBLE = False
+    try:
+        from scoring_logic import charger_matrice, consolider_poids_utilisateur, recommander_quartiers
+        SCORING_DISPONIBLE = True
+        calculer_tous_scores = None
+        print("⚠️ Ancien système de scoring chargé (fallback)")
+    except Exception as e2:
+        print(f"⚠️ Système de scoring non disponible: {e2}")
+        SCORING_DISPONIBLE = False
 
 # Import des nouvelles questions
 try:
     from nouvelles_questions import NOUVELLES_QUESTIONS
+    print("✅ Nouvelles questions (6 questions optimisées) chargées")
 except:
     NOUVELLES_QUESTIONS = None
+    print("⚠️ Utilisation des questions par défaut (10 questions)")
 
 st.set_page_config(
     page_title="Où s'installer à Lille ?",
@@ -34,105 +43,105 @@ st.set_page_config(
 # Données (template)
 # -----------------------
 
-# Utiliser les nouvelles questions si disponibles, sinon garder les anciennes
+# Utiliser les nouvelles questions si disponibles, sinon garder les 10 questions
 if NOUVELLES_QUESTIONS is not None:
     PLACES = NOUVELLES_QUESTIONS
 else:
+    # Questions par défaut (10 questions)
     PLACES = [
         {
-            "name": "Q1 : Ambiance de quartier",
+            "name": "Q1 : Ambiance de Quartier Idéale",
             "emoji": "🏘️",
-            "vibe": "Quel type d'ambiance ?",
-            "tags": ["ambiance", "environnement", "style de vie"],
+            "vibe": "Urbain, Nature, Calme, Fête ?",
+            "tags": ["ambiance", "bruit", "nature"],
             "description": "Quelle ambiance de quartier te correspond le mieux ?",
             "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-            "options": ["Paisible & proche de la nature", "Calme mais avec un peu de vie", "Urbain & dynamique", "Très animé (bars, sorties, nightlife)"]
+            "options": ["Très animé (nightlife)", "Urbain & dynamique", "Calme avec commerces", "Paisible & résidentiel"]
         },
         {
-            "name": "Q2 : Mode de déplacement",
-            "emoji": "🚴",
-            "vibe": "Comment te déplaces-tu ?",
-            "tags": ["transport", "mobilité", "déplacement"],
-            "description": "Quel est ton principal mode de déplacement au quotidien ?",
-            "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-            "options": ["Transports en commun", "Vélo / V'Lille", "Voiture", "À pied"]
-        },
-        {
-            "name": "Q3 : Sensibilité au bruit",
-            "emoji": "🔇",
-            "vibe": "Le bruit te dérange ?",
-            "tags": ["bruit", "calme", "nuisances"],
-            "description": "Quelle est ta sensibilité au bruit environnant ?",
-            "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-            "options": ["Très sensible", "Un peu sensible", "Ça m'est égal", "J'aime quand ça bouge"]
-        },
-        {
-            "name": "Q4 : Importance des espaces verts",
-            "emoji": "🌳",
-            "vibe": "Nature à proximité ?",
-            "tags": ["parcs", "nature", "espaces verts"],
-            "description": "Quelle importance accordes-tu aux espaces verts et parcs ?",
-            "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-            "options": ["Pas important", "Un peu important", "Très important", "Essentiel dans mon quotidien"]
-        },
-        {
-            "name": "Q5 : Budget logement",
+            "name": "Q2 : Flexibilité Budgétaire",
             "emoji": "💰",
-            "vibe": "Quel est ton budget ?",
+            "vibe": "Quel est ton budget logement ?",
             "tags": ["prix", "budget", "loyer"],
             "description": "Quel budget peux-tu consacrer à ton logement ?",
-            "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-            "options": ["Serré", "Modéré", "Confortable", "Flexible"]
+            "image": "https://uploads.lebonbonfr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+            "options": ["Très serré", "Modéré", "Confortable", "Flexible"]
         },
         {
-            "name": "Q6 : Habitudes alimentaires",
-            "emoji": "🍽️",
-            "vibe": "Comment manges-tu ?",
-            "tags": ["cuisine", "restaurants", "alimentation"],
-            "description": "Quelles sont tes habitudes pour les repas ?",
-            "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-            "options": ["Je cuisine souvent", "Je cuisine de temps en temps", "Je cuisine rarement", "Je mange beaucoup dehors"]
-        },
-        {
-            "name": "Q7 : Services de proximité",
+            "name": "Q3 : Exigence en Proximité des Services",
             "emoji": "🏪",
-            "vibe": "Services essentiels ?",
-            "tags": ["commerces", "services", "proximité"],
-            "description": "Quels services sont importants pour toi à proximité ?",
-            "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-            "options": ["Pharmacie", "Commerces / supermarchés", "Restaurants / cafés", "Pas particulièrement"]
+            "vibe": "Tout doit être accessible à pied ?",
+            "tags": ["commerces", "services", "santé", "proximité"],
+            "description": "Quels services sont importants pour toi à proximité immédiate ?",
+            "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+            "options": ["Services médicaux (Pharmacie/Santé)", "Hypermarchés", "Restauration", "Hyper-proximité totale (tout à pied)"]
         },
         {
-            "name": "Q8 : Enfants",
+            "name": "Q4 : Mode de Déplacement Principal",
+            "emoji": "🚲",
+            "vibe": "Comment te déplaces-tu au quotidien ?",
+            "tags": ["transport", "mobilité", "voiture", "vélo"],
+            "description": "Quel est ton principal mode de déplacement au quotidien ?",
+            "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+            "options": ["Transports en commun", "Vélo / V'Lille", "Voiture", "Uniquement à pied"]
+        },
+        {
+            "name": "Q5 : Besoin en Espaces Verts et Nature",
+            "emoji": "🌳",
+            "vibe": "Importance de la nature ?",
+            "tags": ["parcs", "nature", "sport"],
+            "description": "Quelle est l'importance des espaces verts et de la nature à proximité ?",
+            "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+            "options": ["Essentiel (Nature/Détente)", "Juste quelques parcs", "Pratique pour le sport", "Peu important"]
+        },
+        {
+            "name": "Q6 : Infrastructures pour Enfants/Famille",
             "emoji": "👶",
-            "vibe": "As-tu des enfants ?",
+            "vibe": "Écoles, parcs, sport ?",
             "tags": ["famille", "enfants", "écoles"],
-            "description": "As-tu des enfants ou prévois-tu d'en avoir ?",
-            "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-            "options": ["Oui", "Pas encore mais bientôt", "Non", "Jamais"]
-        },
-        {
-            "name": "Q9 : Sécurité et tranquillité",
-            "emoji": "🔒",
-            "vibe": "Sécurité importante ?",
-            "tags": ["sécurité", "tranquillité", "calme"],
-            "description": "Quelle importance pour la sécurité et la tranquillité ?",
+            "description": "Quel est ton besoin en infrastructures pour enfants/famille ?",
             "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
-            "options": ["Très important", "Assez important", "Peu important", "Pas vraiment"]
+            "options": ["Écoles", "Parcs d'enfants", "Écoles + Sport", "Pas pertinent"]
         },
         {
-            "name": "Q10 : Rythme de vie",
-            "emoji": "⚡",
-            "vibe": "Quel est ton rythme ?",
-            "tags": ["rythme", "lifestyle", "activité"],
-            "description": "Quel est ton rythme de vie au quotidien ?",
+            "name": "Q7 : Sensibilité au Bruit",
+            "emoji": "🔇",
+            "vibe": "Quelle est ta tolérance au bruit ?",
+            "tags": ["bruit", "calme", "nuisances"],
+            "description": "Quelle est ta sensibilité au bruit environnant ?",
             "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
-            "options": ["Plutôt tranquille", "Relax & chill", "Dynamique", "Très actif / je sors souvent"]
+            "options": ["Extrêmement sensible", "Un peu sensible", "Ça m'est égal", "J'aime quand ça bouge"]
+        },
+        {
+            "name": "Q8 : Profil de Vie Actuel (Statut)",
+            "emoji": "👤",
+            "vibe": "Ton statut personnel ?",
+            "tags": ["étudiant", "actif", "retraité", "famille"],
+            "description": "Quel est ton profil de vie actuel ?",
+            "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+            "options": ["Étudiant", "Actif (Salarié/Indépendant)", "Retraité", "Famille avec enfants"]
+        },
+        {
+            "name": "Q9 : Rythme de Vie et Habitudes",
+            "emoji": "⚡",
+            "vibe": "Activité et sorties ?",
+            "tags": ["lifestyle", "sport", "sorties"],
+            "description": "Quel est ton rythme de vie et tes habitudes (sorties, sport) ?",
+            "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+            "options": ["Très tranquille (à la maison)", "Sorties fréquentes", "Fait du sport", "Cuisiner vs. Manger dehors"]
+        },
+        {
+            "name": "Q10 : Critère de Qualité de Vie Absolu",
+            "emoji": "🥇",
+            "vibe": "Ton critère non négociable ?",
+            "tags": ["non-négociable", "qualité", "équilibre"],
+            "description": "Quel est le critère qui prime sur tous les autres ?",
+            "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+            "options": ["Uniquement la performance globale (Équilibre)", "Le meilleur prix", "Le moins de bruit", "L'hyper-proximité"]
         },
     ]
 
 TOTAL = len(PLACES)
-
 
 # -----------------------
 # Styles globaux - Tinder Design + iOS
@@ -801,13 +810,15 @@ def next_question():
     # Si on a fini toutes les questions, calculer les recommandations
     if st.session_state.current_index == TOTAL and SCORING_DISPONIBLE:
         if st.session_state.matrice_data is not None:
-            # Nouveau système retourne (poids_criteres, poids_categories)
+            # Système V2 retourne (poids_criteres, poids_categories)
             try:
-                poids, poids_categories = consolider_poids_utilisateur(st.session_state.reponses)
-            except ValueError:
-                # Ancien système retourne juste poids
+                poids_result = consolider_poids_utilisateur(st.session_state.reponses)
+                if isinstance(poids_result, tuple):
+                    poids, poids_categories = poids_result
+                else:
+                    poids = poids_result
+            except:
                 poids = consolider_poids_utilisateur(st.session_state.reponses)
-                poids_categories = None
             
             # Calculer le top 3
             st.session_state.top_quartiers = recommander_quartiers(
@@ -816,14 +827,20 @@ def next_question():
                 n_recommandations=3
             )
             
-            # Calculer TOUS les scores pour la carte
-            try:
-                st.session_state.tous_scores = calculer_tous_scores(
-                    poids,
-                    st.session_state.matrice_data
-                )
-            except:
-                # Fallback si calculer_tous_scores n'existe pas
+            # Calculer TOUS les scores pour la carte (V2 a une fonction dédiée)
+            if calculer_tous_scores is not None:
+                try:
+                    st.session_state.tous_scores = calculer_tous_scores(
+                        poids,
+                        st.session_state.matrice_data
+                    )
+                except:
+                    st.session_state.tous_scores = recommander_quartiers(
+                        poids, 
+                        st.session_state.matrice_data, 
+                        n_recommandations=999
+                    )
+            else:
                 st.session_state.tous_scores = recommander_quartiers(
                     poids, 
                     st.session_state.matrice_data, 
@@ -835,14 +852,14 @@ def enregistrer_reponse(option_texte):
     """Enregistre la réponse de l'utilisateur pour la question actuelle."""
     place = PLACES[st.session_state.current_index]
     
-    # Stocker l'option avec le question_id si disponible (nouveau système)
+    # Nouveau système V2 : stocker avec question_id
     if 'question_id' in place:
         st.session_state.reponses[st.session_state.current_index] = {
             'question_id': place['question_id'],
             'option': option_texte
         }
     else:
-        # Ancien système avec poids basé sur la position du bouton
+        # Ancien système : déterminer le poids selon la position du bouton (1-4)
         if 'options' in place:
             position = place['options'].index(option_texte) if option_texte in place['options'] else 0
             poids = position + 1
@@ -1323,13 +1340,15 @@ else:
                 
                 # Si le quiz est complété, afficher comparaison attentes vs zone
                 if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty and len(st.session_state.reponses) > 0:
-                    # Nouveau système retourne (poids_criteres, poids_categories)
+                    # Gérer les deux systèmes de scoring
                     try:
-                        poids, poids_categories = consolider_poids_utilisateur(st.session_state.reponses)
-                    except ValueError:
-                        # Ancien système retourne juste poids
+                        poids_result = consolider_poids_utilisateur(st.session_state.reponses)
+                        if isinstance(poids_result, tuple):
+                            poids, poids_categories = poids_result
+                        else:
+                            poids = poids_result
+                    except:
                         poids = consolider_poids_utilisateur(st.session_state.reponses)
-                        poids_categories = None
                     
                     total_poids = sum(poids.values())
                     
