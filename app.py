@@ -1367,9 +1367,9 @@ else:
                     'Norm_Nb_Bars': '🍽️ Vie animée',                    # Regroupé
                     'Norm_Nb_Transports': '🚇 Transports',
                     'Norm_Nb_VLille': '🚴 V\'Lille',
-                    'Norm_Nb_ParcsEnfants': '👶 Aires de jeux',
+                    'Norm_Nb_ParcsEnfants': '👶 Enfants (écoles & aires de jeux)',  # Regroupé
                     'Norm_Nb_ComplexesSportifs': '⚽ Complexes sportifs',
-                    'Norm_Nb_Ecoles': '🏫 Écoles',
+                    'Norm_Nb_Ecoles': '👶 Enfants (écoles & aires de jeux)',        # Regroupé
                     'Norm_Nb_Parkings': '🅿️ Parkings',
                 }
                 
@@ -1377,6 +1377,7 @@ else:
                 regroupements = {
                     '🏪 Services de proximité': ['Norm_Nb_Pharmacies', 'Norm_Nb_Commerces'],
                     '🍽️ Vie animée': ['Norm_Nb_Restaurants', 'Norm_Nb_Bars'],
+                    '👶 Enfants (écoles & aires de jeux)': ['Norm_Nb_Ecoles', 'Norm_Nb_ParcsEnfants'],
                 }
                 
                 # Si le quiz est complété, afficher comparaison attentes vs zone
