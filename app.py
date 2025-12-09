@@ -465,12 +465,25 @@ st.markdown(
             opacity: 1;
         }
 
-        /* Bouton Recommencer - stylisé */
+        /* Bouton Recommencer - blanc épuré rond */
         [data-testid="stButton"] > :first-child > button {
-            font-size: 18px !important;
-            padding: 16px 24px !important;
-            border-radius: 28px !important;
+            background: #ffffff !important;
+            color: #121212 !important;
+            border: 2px solid #ffe8e9 !important;
+            font-size: 16px !important;
+            padding: 14px 32px !important;
+            border-radius: 50px !important;
             font-weight: 600 !important;
+            box-shadow: none !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        [data-testid="stButton"] > :first-child > button:hover {
+            background: #fff5f5 !important;
+            border-color: #ff5a5f !important;
+            color: #ff5a5f !important;
+            box-shadow: none !important;
+            transform: scale(1.02) !important;
         }
 
         /* Espacement entre colonnes de boutons */
