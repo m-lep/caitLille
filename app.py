@@ -1138,27 +1138,6 @@ else:
         # Obtenir la couleur basée sur le score normalisé
         color = get_color_from_score(score, min_score, max_score)
         
-        # Créer le popup avec les détails
-        nom_iris = feature['properties'].get('nom_iris', 'N/A')
-        code_iris = feature['properties'].get('iris', 'N/A')
-        
-        popup_text = f"""
-        <div style="font-family: Arial; width: 200px;">
-            <h4 style="margin: 0 0 10px 0; color: #121212;">{nom_iris}</h4>
-            <div style="background: {color}; padding: 8px; border-radius: 4px; margin-bottom: 10px;">
-                <p style="margin: 0; color: white; font-weight: bold;">Score: {score}/100</p>
-            </div>
-            <p style="margin: 5px 0; font-size: 12px; color: #6c6c6c;">
-                <strong>Code IRIS:</strong> {code_iris}
-            </p>
-            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e8e8e8;">
-                <p style="margin: 0; font-size: 11px; color: #6c6c6c;">
-                    Compatibilité basée sur vos préférences
-                </p>
-            </div>
-        </div>
-        """
-        
         folium.GeoJson(
             {
                 "type": "Feature",
@@ -1179,7 +1158,6 @@ else:
                 "opacity": 1,
                 "fillOpacity": 0.8,
             },
-            popup=folium.Popup(popup_text, max_width=300),
             tooltip=folium.Tooltip(
                 f'<div style="background-color: {color}; color: white; font-weight: bold; border: none; padding: 4px 8px; border-radius: 4px;">Score: {score:.0f}</div>',
                 sticky=False
