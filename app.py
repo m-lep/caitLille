@@ -1236,6 +1236,12 @@ else:
         if st.session_state.matrice_data is not None:
             quartier_row = st.session_state.matrice_data[st.session_state.matrice_data['NOM_IRIS'] == nom_iris]
             
+            # Debug: afficher les infos
+            st.write(f"DEBUG - Nom recherché: '{nom_iris}'")
+            st.write(f"DEBUG - Lignes trouvées: {len(quartier_row)}")
+            if quartier_row.empty:
+                st.write(f"DEBUG - Noms disponibles dans matrice: {st.session_state.matrice_data['NOM_IRIS'].unique()[:10]}")
+            
             if not quartier_row.empty:
                 # Afficher le score de compatibilité si le quiz est terminé
                 if st.session_state.tous_scores is not None and not st.session_state.tous_scores.empty:
