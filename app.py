@@ -1411,9 +1411,9 @@ else:
                     
                     # Afficher le graphique de comparaison pour TOUS les critères importants
                     for critere in criteres_importants:
-                        st.markdown(
+                            st.markdown(
                             f"""
-                            <div style="margin-bottom: 16px; padding: 14px; background: white; border-radius: 10px; border: 1px solid #e5e7eb;">
+                            <div style="margin-bottom: 16px; padding: 14px; background: white; border-radius: 10px; border: 1px solid #ffe8e9;">
                                 <div style="margin-bottom: 10px;">
                                     <span style="color: #121212; font-weight: 600; font-size: 14px;">{critere['nom']}</span>
                                 </div>
@@ -1421,16 +1421,16 @@ else:
                                     <div style="font-size: 11px; margin-bottom: 3px; color: #6b7280;">
                                         <span>Ce que vous cherchez</span>
                                     </div>
-                                    <div style="background: #f3f4f6; height: 10px; border-radius: 5px; overflow: hidden;">
-                                        <div style="background: #3b82f6; height: 100%; width: {critere['attente']:.0f}%;"></div>
+                                    <div style="background: #fff5f5; height: 10px; border-radius: 5px; overflow: hidden;">
+                                        <div style="background: linear-gradient(90deg, #ff5a5f, #ff7a7d); height: 100%; width: {critere['attente']:.0f}%;"></div>
                                     </div>
                                 </div>
                                 <div>
                                     <div style="font-size: 11px; margin-bottom: 3px; color: #6b7280;">
                                         <span>Ce que le quartier offre</span>
                                     </div>
-                                    <div style="background: #f3f4f6; height: 10px; border-radius: 5px; overflow: hidden;">
-                                        <div style="background: #8b5cf6; height: 100%; width: {critere['zone']:.0f}%;"></div>
+                                    <div style="background: #fff5f5; height: 10px; border-radius: 5px; overflow: hidden;">
+                                        <div style="background: linear-gradient(90deg, #ffb4b8, #ffd4d6); height: 100%; width: {critere['zone']:.0f}%;"></div>
                                     </div>
                                 </div>
                             </div>
