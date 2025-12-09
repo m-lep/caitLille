@@ -487,60 +487,20 @@ st.markdown(
             line-height: 1.4 !important;
         }
 
-        /* Bouton 1: Gris neutre */
-        [data-testid="stHorizontalBlock"] > div:nth-child(1) [data-testid="stButton"] button {
-            background: #f3f4f6 !important;
-            color: #6b7280 !important;
-            border: 2px solid #d1d5db !important;
+        /* Boutons réponse: Style Tinder épuré blanc/rose */
+        [data-testid="stHorizontalBlock"] > div [data-testid="stButton"] button {
+            background: #ffffff !important;
+            color: #121212 !important;
+            border: 2px solid #ffe8e9 !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        [data-testid="stHorizontalBlock"] > div:nth-child(1) [data-testid="stButton"] button:hover {
-            background: #e5e7eb !important;
-            border-color: #9ca3af !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.15) !important;
-        }
-
-        /* Bouton 2: Gris neutre (identique) */
-        [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stButton"] button {
-            background: #f3f4f6 !important;
-            color: #6b7280 !important;
-            border: 2px solid #d1d5db !important;
-        }
-
-        [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stButton"] button:hover {
-            background: #e5e7eb !important;
-            border-color: #9ca3af !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.15) !important;
-        }
-
-        /* Bouton 3: Gris neutre (identique) */
-        [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stButton"] button {
-            background: #f3f4f6 !important;
-            color: #6b7280 !important;
-            border: 2px solid #d1d5db !important;
-        }
-
-        [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stButton"] button:hover {
-            background: #e5e7eb !important;
-            border-color: #9ca3af !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.15) !important;
-        }
-
-        /* Bouton 4: Gris neutre (identique) */
-        [data-testid="stHorizontalBlock"] > div:nth-child(4) [data-testid="stButton"] button {
-            background: #f3f4f6 !important;
-            color: #6b7280 !important;
-            border: 2px solid #d1d5db !important;
-        }
-
-        [data-testid="stHorizontalBlock"] > div:nth-child(4) [data-testid="stButton"] button:hover {
-            background: #e5e7eb !important;
-            border-color: #9ca3af !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.15) !important;
+        [data-testid="stHorizontalBlock"] > div [data-testid="stButton"] button:hover {
+            background: linear-gradient(135deg, #ff5a5f, #ff7a7d) !important;
+            color: #ffffff !important;
+            border-color: #ff5a5f !important;
+            transform: translateY(-2px) scale(1.02) !important;
+            box-shadow: 0 8px 20px rgba(255, 90, 95, 0.25) !important;
         }
 
         /* Fin de quiz */
@@ -1081,11 +1041,17 @@ else:
     with open("iris_v2_Lille.geojson") as f:
         geojson_data = json.load(f)
 
-    # Créer la carte Folium centrée sur la Place de la République
+    # Créer la carte Folium centrée sur la Place de la République - Style Apple Maps
     m = folium.Map(
         location=[50.6300, 3.2600],  # Place de la République, Lille
         zoom_start=13,
-        tiles="CartoDB positron",
+        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        attr='© OpenStreetMap contributors © CARTO',
+        zoom_control=True,
+        scrollWheelZoom=True,
+        dragging=True,
+        max_zoom=18,
+        min_zoom=11
     )
 
     # Fonction pour générer une couleur basée sur un score normalisé (0-100) avec plus de nuances
@@ -1216,20 +1182,20 @@ else:
             },
             style_function=lambda x, current_color=color: {
                 "fillColor": current_color,
-                "color": "#2d2d2d",  # Bordure noire/gris foncé
-                "weight": 1.2,
-                "opacity": 0.8,
-                "fillOpacity": 0.45,  # Opacité réduite pour plus de beauté
+                "color": "#ffffff",  # Bordure blanche ultra-fine style Apple
+                "weight": 0.5,
+                "opacity": 0.4,
+                "fillOpacity": 0.65,  # Opacité augmentée pour meilleure lisibilité
             },
             highlight_function=lambda x, current_color=color: {
                 "fillColor": current_color,
-                "color": "#ff5a5f",  # Bordure rouge au survol
-                "weight": 2.5,
+                "color": "#ff5a5f",  # Bordure rose Tinder au survol
+                "weight": 2,
                 "opacity": 1,
-                "fillOpacity": 0.75,  # Plus opaque au survol
+                "fillOpacity": 0.85,
             },
             tooltip=folium.Tooltip(
-                f'<div style="background-color: {color}; color: white; font-weight: bold; border: none; padding: 4px 8px; border-radius: 4px;">{nom_iris_display}</div>',
+                f'<div style="background: #ffffff; color: #121212; font-weight: 600; font-size: 13px; border: none; padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); font-family: -apple-system, BlinkMacSystemFont, sans-serif;">{nom_iris_display}</div>',
                 sticky=False
             ),
         ).add_to(m)
