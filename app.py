@@ -1068,30 +1068,7 @@ else:
     
     # Afficher un message si le scoring est disponible ou non
     if st.session_state.top_quartiers is not None and not st.session_state.top_quartiers.empty:
-        
-        # Afficher le top 3 des quartiers avec leurs scores
-        st.markdown("### 🏆 Vos meilleurs quartiers :")
-        for idx, row in st.session_state.top_quartiers.iterrows():
-            score_color = "#10b981" if row['Score_Max'] > 60 else "#ff5a5f" if row['Score_Max'] < 40 else "#fbbf24"
-            st.markdown(
-                f"""
-                <div style="background: white; padding: 16px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid {score_color};">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h3 style="margin: 0; color: #121212; font-size: 18px;">🏘️ {row['NOM_IRIS']}</h3>
-                            <p style="margin: 4px 0 0 0; color: #6c6c6c; font-size: 14px;">Score de compatibilité</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 32px; font-weight: bold; color: {score_color};">{row['Score_Max']:.0f}</div>
-                            <div style="font-size: 12px; color: #6c6c6c;">/100</div>
-                        </div>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-        
-        st.markdown("---")
+        pass  # Les quartiers sont affichés sur la carte
         
     elif not SCORING_DISPONIBLE or st.session_state.matrice_data is None:
         st.info("ℹ️ Mode exploration : Les scores affichés sont indicatifs. Pour des recommandations personnalisées, ajoutez le fichier `DATASET scores brut.xlsx`.")
