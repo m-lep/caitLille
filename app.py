@@ -1628,6 +1628,8 @@ else:
         st.session_state.disliked = []
         st.session_state.reponses = {}
         st.session_state.top_quartiers = None
+        st.session_state.selected_quartier = None
+        st.session_state.selected_quartier_nom = None
     
     st.markdown(
         """
