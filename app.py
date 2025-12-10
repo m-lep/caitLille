@@ -1447,10 +1447,6 @@ else:
                     # Trier par priorité utilisateur (attente) décroissante
                     criteres_importants.sort(key=lambda x: x['attente'], reverse=True)
                     
-                    # Afficher détails budget si c'est un critère important
-                    if any(c['nom'] == '💰 Prix abordable' for c in criteres_importants):
-                        st.info(f"🏠 **Loyers dans ce quartier** : Consultez les offres disponibles ci-dessous pour voir les prix actuels de location")
-                    
                     # Afficher le graphique de comparaison pour TOUS les critères importants
                     for critere in criteres_importants:
                             st.markdown(
