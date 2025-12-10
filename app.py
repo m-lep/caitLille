@@ -1064,7 +1064,11 @@ else:
     
     # Afficher un message si le scoring est disponible ou non
     if st.session_state.top_quartiers is not None and not st.session_state.top_quartiers.empty:
-        pass  # Les quartiers sont affichés sur la carte
+        # Sélectionner automatiquement le meilleur quartier (top 1) si pas déjà sélectionné
+        if not st.session_state.selected_quartier:
+            meilleur_quartier = st.session_state.top_quartiers.iloc[0]
+            st.session_state.selected_quartier = meilleur_quartier['CODE_IRIS']
+            st.session_state.selected_quartier_nom = meilleur_quartier['NOM_IRIS']
         
     elif not SCORING_DISPONIBLE or st.session_state.matrice_data is None:
         st.info("ℹ️ Mode exploration : Les scores affichés sont indicatifs. Pour des recommandations personnalisées, ajoutez le fichier `DATASET scores brut.xlsx`.")
