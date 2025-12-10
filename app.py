@@ -1299,6 +1299,133 @@ else:
         except Exception:
             pass
 
+    # ═══════════════════════════════════════════════════════════════════════
+    # SECTION OFFRES DISPONIBLES - Toujours affichée
+    # ═══════════════════════════════════════════════════════════════════════
+    st.markdown("---")
+    st.markdown("### 🏠 Offres disponibles en location")
+    
+    # Extraire le budget de la réponse Q1 si disponible
+    budget_min, budget_max = 200, None
+    if 0 in st.session_state.reponses:
+        budget_option = st.session_state.reponses[0].get('option', '')
+        budget_min, budget_max = get_budget_range_from_response(budget_option)
+    
+    # Scraper les annonces réelles avec le budget de l'utilisateur
+    with st.spinner("Chargement des offres..."):
+        annonces = scraper_immosens(secteur="Lille", budget_min=budget_min, budget_max=budget_max, max_annonces=10)
+    
+    if not annonces:
+        st.info("Aucune offre trouvée actuellement. Essayez de modifier votre budget.")
+    else:
+        # Carrousel horizontal avec plusieurs offres d'annonces
+        st.markdown(
+            """
+            <style>
+                .carousel-container {
+                    display: flex;
+                    gap: 14px;
+                    overflow-x: auto;
+                    padding: 12px 0;
+                    scroll-behavior: smooth;
+                }
+                .carousel-container::-webkit-scrollbar {
+                    height: 6px;
+                }
+                .carousel-container::-webkit-scrollbar-track {
+                    background: #f1f5f9;
+                    border-radius: 10px;
+                }
+                .carousel-container::-webkit-scrollbar-thumb {
+                    background: #ff5a5f;
+                    border-radius: 10px;
+                }
+                .carousel-container::-webkit-scrollbar-thumb:hover {
+                    background: #ff7a7d;
+                }
+                .listing-card {
+                    flex: 0 0 280px;
+                    background: white;
+                    border: 1px solid #ffe8e9;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                }
+                .listing-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 8px 16px rgba(255, 90, 95, 0.12);
+                }
+                .listing-image {
+                    width: 100%;
+                    height: 160px;
+                    object-fit: cover;
+                    background: #f3f4f6;
+                }
+                .listing-content {
+                    padding: 12px;
+                }
+                .listing-price {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #ff5a5f;
+                    margin-bottom: 6px;
+                }
+                .listing-type {
+                    font-size: 13px;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                }
+                .listing-location {
+                    font-size: 12px;
+                    color: #9ca3af;
+                    margin-bottom: 8px;
+                }
+                .listing-link {
+                    display: inline-block;
+                    padding: 6px 12px;
+                    background: white;
+                    color: #ff5a5f;
+                    border: 1px solid #ff5a5f;
+                    border-radius: 6px;
+                    text-decoration: none;
+                    font-size: 12px;
+                    font-weight: 500;
+                    transition: all 0.2s;
+                }
+                .listing-link:hover {
+                    background: #ffe8e9;
+                }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        cards_html = ""
+        for annonce in annonces:
+            details = f"{annonce['pieces']}" if annonce['pieces'] != 'N/A' else ""
+            if details and annonce['surface'] != 'N/A':
+                details += f" • {annonce['surface']}"
+            
+            card = f"""
+            <div class="listing-card">
+                <img src="{annonce['image']}" class="listing-image" alt="{annonce['type']}">
+                <div class="listing-content">
+                    <div class="listing-price">{annonce['prix']}</div>
+                    <div class="listing-type">{annonce['type']}</div>
+                    <div class="listing-location">{annonce['localisation']} {details}</div>
+                    <a href="{annonce['lien']}" target="_blank" class="listing-link">Voir l'offre</a>
+                </div>
+            </div>
+            """
+            cards_html += card
+        
+        listings_html = f'<div class="carousel-container">{cards_html}</div>'
+        st.markdown(listings_html, unsafe_allow_html=True)
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # DÉTAILS DU QUARTIER SÉLECTIONNÉ
+    # ═══════════════════════════════════════════════════════════════════════
+
     # Afficher les détails du quartier sélectionné
     if st.session_state.selected_quartier:
         code_iris_selected = st.session_state.selected_quartier
@@ -1497,129 +1624,6 @@ else:
                             unsafe_allow_html=True
                         )
         
-        # Section annonces immobilières
-        st.markdown("---")
-        st.markdown(f"### 🏠 Offres disponibles")
-        
-        # Extraire le budget de la réponse Q1 si disponible
-        budget_min, budget_max = 200, None
-        if 0 in st.session_state.reponses:
-            budget_option = st.session_state.reponses[0].get('option', '')
-            budget_min, budget_max = get_budget_range_from_response(budget_option)
-        
-        # Scraper les annonces réelles avec le budget de l'utilisateur
-        with st.spinner("Chargement des offres..."):
-            annonces = scraper_immosens(secteur=nom_iris, budget_min=budget_min, budget_max=budget_max, max_annonces=10)
-        
-        if not annonces:
-            st.info(f"Aucune offre trouvée pour {nom_iris}. Essayez un autre quartier.")
-        else:
-            # Carrousel horizontal avec plusieurs offres d'annonces
-            st.markdown(
-                """
-                <style>
-                    .carousel-container {
-                        display: flex;
-                        gap: 14px;
-                        overflow-x: auto;
-                        padding: 12px 0;
-                        margin-bottom: 16px;
-                        scroll-behavior: smooth;
-                    }
-                    .carousel-container::-webkit-scrollbar {
-                        height: 4px;
-                    }
-                    .carousel-container::-webkit-scrollbar-track {
-                        background: #f0f0f0;
-                        border-radius: 2px;
-                    }
-                    .carousel-container::-webkit-scrollbar-thumb {
-                        background: #ccc;
-                        border-radius: 2px;
-                    }
-                    .carousel-container::-webkit-scrollbar-thumb:hover {
-                        background: #999;
-                    }
-                    .listing-card {
-                        flex: 0 0 320px;
-                        border: 1px solid #e8e8e8;
-                        padding: 12px;
-                        border-radius: 10px;
-                        background: white;
-                        cursor: pointer;
-                        transition: transform 0.2s ease, box-shadow 0.2s ease;
-                    }
-                    .listing-card:hover {
-                        transform: translateY(-4px);
-                        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-                    }
-                    .listing-image {
-                        width: 100%;
-                        height: 160px;
-                        border-radius: 8px;
-                        background-size: cover;
-                        background-position: center;
-                        margin-bottom: 10px;
-                    }
-                    .listing-title {
-                        font-weight: 700;
-                        margin-bottom: 6px;
-                        color: #121212;
-                    }
-                    .listing-location {
-                        color: #6c6c6c;
-                        font-size: 13px;
-                        margin-bottom: 8px;
-                    }
-                    .listing-price {
-                        font-size: 16px;
-                        font-weight: 800;
-                        margin-bottom: 8px;
-                    }
-                    .listing-note {
-                        margin-top: 8px;
-                        font-size: 13px;
-                        color: #6c6c6c;
-                    }
-                    .listing-link {
-                        display: inline-block;
-                        margin-top: 8px;
-                        padding: 6px 12px;
-                        background: #ff5a5f;
-                        color: white;
-                        text-decoration: none;
-                        border-radius: 6px;
-                        font-size: 12px;
-                        font-weight: 600;
-                    }
-                    .listing-link:hover {
-                        background: #ff7a7d;
-                    }
-                </style>
-                """,
-                unsafe_allow_html=True,
-            )
-
-            # Générer le HTML du carrousel avec les vraies données
-            cards_html = ""
-            for annonce in annonces:
-                details = f"{annonce['pieces']}" if annonce['pieces'] != 'N/A' else ""
-                if annonce['surface'] != 'N/A':
-                    details += f" • {annonce['surface']}"
-                
-                cards_html += f"""<div class="listing-card">
-    <div class="listing-image" style="background-image: url('{annonce['image']}');"></div>
-    <div class="listing-title">{annonce['type']}</div>
-    <div class="listing-location">{annonce['localisation']} {details}</div>
-    <div class="listing-price" style="color: #ff5a5f;">{annonce['prix']}</div>
-    <a href="{annonce['lien']}" target="_blank" class="listing-link">Voir l'offre</a>
-</div>"""
-            
-            listings_html = f'<div class="carousel-container">{cards_html}</div>'
-
-            st.markdown(listings_html, unsafe_allow_html=True)
-            st.markdown("\n---\n")
-
     st.markdown("---")
 
     # Bouton Recommencer
