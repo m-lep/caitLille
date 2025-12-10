@@ -4,7 +4,7 @@ NOUVELLES_QUESTIONS = [
         "emoji": "💰",
         "vibe": "Quel est ton budget ?",
         "tags": ["prix", "budget", "loyer"],
-        "description": "Quel est ton budget mensuel maximum de loyer ?",
+        "description": "Quel est ton budget mensuel maximum de loyer ? (tout compris)",
         "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "budget",
         "options": [
