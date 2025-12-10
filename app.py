@@ -1406,17 +1406,8 @@ else:
             if details and annonce['surface'] != 'N/A':
                 details += f" • {annonce['surface']}"
             
-            card = f"""
-            <div class="listing-card">
-                <img src="{annonce['image']}" class="listing-image" alt="{annonce['type']}">
-                <div class="listing-content">
-                    <div class="listing-price">{annonce['prix']}</div>
-                    <div class="listing-type">{annonce['type']}</div>
-                    <div class="listing-location">{annonce['localisation']} {details}</div>
-                    <a href="{annonce['lien']}" target="_blank" class="listing-link">Voir l'offre</a>
-                </div>
-            </div>
-            """
+            # Construire le HTML sans espaces/retours à la ligne excessifs
+            card = f'<div class="listing-card"><img src="{annonce["image"]}" class="listing-image" alt="{annonce["type"]}"><div class="listing-content"><div class="listing-price">{annonce["prix"]}</div><div class="listing-type">{annonce["type"]}</div><div class="listing-location">{annonce["localisation"]} {details}</div><a href="{annonce["lien"]}" target="_blank" class="listing-link">Voir l\'offre</a></div></div>'
             cards_html += card
         
         listings_html = f'<div class="carousel-container">{cards_html}</div>'
