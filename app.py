@@ -1509,7 +1509,7 @@ else:
         
         # Afficher les offres pour ce quartier spécifique
         st.markdown("---")
-        st.markdown(f"### 🏠 Offres disponibles à {nom_iris}")
+        st.markdown("### 🏠 Offres disponibles")
         
         # Extraire le budget de la réponse Q1 si disponible
         budget_min, budget_max = 200, None
