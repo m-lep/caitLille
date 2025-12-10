@@ -1,0 +1,560 @@
+═════════════════════════════════════════════════════════════════════════════════
+                    GUIDE COMPLET DU SYSTÈME DE SCORING
+                              CaitLille App
+═════════════════════════════════════════════════════════════════════════════════
+
+📋 TABLE DES MATIÈRES
+─────────────────────────────────────────────────────────────────────────────────
+1. Principes généraux du scoring
+2. Les 6 questions du quiz et leurs impacts
+3. Système de pondération des critères
+4. Calcul du score final
+5. Exemples concrets de scoring
+6. Critères d'évaluation des quartiers
+
+
+═════════════════════════════════════════════════════════════════════════════════
+1. PRINCIPES GÉNÉRAUX DU SCORING
+═════════════════════════════════════════════════════════════════════════════════
+
+Le système de scoring fonctionne sur la base d'une PONDÉRATION DYNAMIQUE:
+- Chaque réponse du quiz augmente l'importance (poids) de certains critères
+- Les quartiers sont évalués sur 14 critères différents
+- Le score final pour chaque quartier = moyenne pondérée des critères
+
+
+FORMULE GÉNÉRALE:
+  Score_Quartier = (Σ Critère_i × Poids_i) / Σ Poids_i
+  
+  Où:
+  - Critère_i = score du quartier pour le critère i (0-100)
+  - Poids_i = poids assigné au critère i basé sur les réponses
+
+
+═════════════════════════════════════════════════════════════════════════════════
+2. LES 6 QUESTIONS ET LEURS IMPACTS
+═════════════════════════════════════════════════════════════════════════════════
+
+──────────────────────────────────────────────────────────────────────────────────
+Q1: BUDGET MENSUEL DE LOYER ❓ "Quel est ton budget mensuel maximum ?"
+──────────────────────────────────────────────────────────────────────────────────
+
+➤ Option 1: 🪙 "Serré (< 600€/mois)"
+  Poids appliqués:
+  • PRIX (Prix abordable)              +30  ⭐⭐⭐ CRUCIAL - Poids maximum
+  • Services proximité                 +2
+  • Transports                         +2
+  
+  Logique: Budget très limité → prix devient LE critère principal
+
+
+➤ Option 2: 💵 "Modéré (600-900€/mois)"
+  Poids appliqués:
+  • PRIX (Prix abordable)              +18
+  • Services proximité                 +2
+  • Vie animée                         +1
+  
+  Logique: Budget modéré → prix reste important mais moins écrasant
+
+
+➤ Option 3: 💰 "Confortable (900-1300€/mois)"
+  Poids appliqués:
+  • PRIX (Prix abordable)              +10
+  • Vie animée                         +2
+  • Services proximité                 +2
+  
+  Logique: Budget plus élevé → prix moins discriminant, qualité de vie prime
+
+
+➤ Option 4: 💎 "Aucune limite (> 1300€/mois)"
+  Poids appliqués:
+  • Vie animée                         +3
+  • Services proximité                 +2
+  • Calme                              +1
+  
+  Logique: Budget illimité → prix n'influe plus, focus sur ambiance/services
+
+
+──────────────────────────────────────────────────────────────────────────────────
+Q2: AMBIANCE DE QUARTIER ❓ "Quelle ambiance de quartier te correspond ?"
+──────────────────────────────────────────────────────────────────────────────────
+
+➤ Option 1: 🌳 "Très calme, nature et verdure"
+  Poids appliqués:
+  • Calme                              +4
+  • Vie animée                         -3  ⚠️ PÉNALITÉ (pas de vie nocturne)
+  • Services proximité                 +1
+
+
+➤ Option 2: 🏡 "Calme avec services de base"
+  Poids appliqués:
+  • Calme                              +2
+  • Services proximité                 +2
+  • Famille (écoles, parcs enfants)   +1
+
+
+➤ Option 3: 🏙️ "Dynamique et urbain"
+  Poids appliqués:
+  • Vie animée                         +2
+  • Services proximité                 +2
+  • Transports                         +1
+
+
+➤ Option 4: 🎉 "Très animé (vie nocturne, bars)"
+  Poids appliqués:
+  • Vie animée                         +4
+  • Restaurants/bars                   +3
+  • Calme                              -2  ⚠️ PÉNALITÉ (bruit/agitation)
+
+
+──────────────────────────────────────────────────────────────────────────────────
+Q3: MODE DE VIE ❓ "Comment vis-tu au quotidien ?"
+──────────────────────────────────────────────────────────────────────────────────
+
+➤ Option 1: 🍳 "Je cuisine, j'aime le calme"
+  Poids appliqués:
+  • Calme                              +3
+  • Services proximité                 +2
+  • Vie animée                         -1
+
+
+➤ Option 2: ⚖️ "Équilibré (cuisine + sorties)"
+  Poids appliqués:
+  • Services proximité                 +3
+  • Restaurants/bars                   +1
+  • Calme                              +1
+
+
+➤ Option 3: 🍷 "Je sors souvent au resto/bars"
+  Poids appliqués:
+  • Restaurants/bars                   +3
+  • Vie animée                         +2
+  • Services proximité                 +1
+
+
+➤ Option 4: 🌃 "Vie nocturne intense"
+  Poids appliqués:
+  • Restaurants/bars                   +4
+  • Vie animée                         +3
+  • Calme                              -2
+
+
+──────────────────────────────────────────────────────────────────────────────────
+Q4: STATUT PERSONNEL ❓ "Quel est ton profil ?"
+──────────────────────────────────────────────────────────────────────────────────
+
+➤ Option 1: 👶 "Parent avec enfants"
+  Poids appliqués:
+  • Famille (écoles, parcs enfants)   +5  ⭐ Très important
+  • Calme                              +2
+  • Services proximité                 +2
+
+
+➤ Option 2: 🎓 "Étudiant"
+  Poids appliqués:
+  • Vie animée                         +3
+  • Transports                         +3  (bus, métro)
+  • Services proximité                 +1
+
+
+➤ Option 3: 💼 "Actif professionnel"
+  Poids appliqués:
+  • Transports                         +3
+  • Services proximité                 +2
+  • Calme                              +1
+
+
+➤ Option 4: 👴 "Senior"
+  Poids appliqués:
+  • Services proximité                 +4  (pharmacies, commerces)
+  • Calme                              +2
+  • Transports                         +1
+
+
+──────────────────────────────────────────────────────────────────────────────────
+Q5: TRANSPORT ❓ "Quel est ton mode de déplacement principal ?"
+──────────────────────────────────────────────────────────────────────────────────
+
+➤ Option 1: 🚇 "Transports publics (bus, métro)"
+  Poids appliqués:
+  • Transports                         +4
+  • Services proximité                 +1
+
+
+➤ Option 2: 🚴 "Vélo (V'Lille)"
+  Poids appliqués:
+  • Transports (V'Lille)               +3
+  • Calme                              +1
+
+
+➤ Option 3: 🚗 "Voiture personnelle"
+  Poids appliqués:
+  • Parking                            +3
+  • Services proximité                 +1
+
+
+➤ Option 4: 🚶 "À pied / court trajet"
+  Poids appliqués:
+  • Services proximité                 +4
+  • Calme                              +1
+
+
+──────────────────────────────────────────────────────────────────────────────────
+Q6: ACTIVITÉS SPORTIVES ❓ "Quel est ton niveau de sportivité ?"
+──────────────────────────────────────────────────────────────────────────────────
+
+➤ Option 1: 🏋️ "Très sportif (gym, courses)"
+  Poids appliqués:
+  • Sport (complexes sportifs)         +4
+  • Calme                              +1
+
+
+➤ Option 2: 🏃 "Occasionnellement sportif"
+  Poids appliqués:
+  • Sport (complexes sportifs)         +2
+  • Calme (pour nature/parc)           +1
+
+
+➤ Option 3: 🚶 "Peu sportif"
+  Poids appliqués:
+  • Calme                              +2
+  • Services proximité                 +1
+
+
+➤ Option 4: 🛋️ "Sédentaire"
+  Poids appliqués:
+  • Calme                              +3
+  • Services proximité                 +2
+
+
+═════════════════════════════════════════════════════════════════════════════════
+3. SYSTÈME DE PONDÉRATION DES CRITÈRES
+═════════════════════════════════════════════════════════════════════════════════
+
+14 CRITÈRES D'ÉVALUATION DES QUARTIERS:
+──────────────────────────────────────────────────────────────────────────────────
+
+1. 💰 PRIX ABORDABLE
+   Source: Prix median au m² en vente (proxy pour marché locatif)
+   Score: 0-100 (100 = très abordable)
+   Activation: Principalement Q1 (Budget)
+   Poids par défaut: 0 (augmente si budget limité)
+
+2. 🛍️ SERVICES PROXIMITÉ
+   Source: Nombre de pharmacies + commerces
+   Score: 0-100 (100 = beaucoup de services)
+   Activation: Q2 (Ambiance), Q3 (Lifestyle), Q4 (Statut), Q5 (Transport)
+   Poids par défaut: +1 à +4 selon profil
+
+3. 🎉 VIE ANIMÉE
+   Source: Nombre de bars + restaurants
+   Score: 0-100 (100 = très animé)
+   Activation: Q2 (Ambiance), Q3 (Lifestyle), Q4 (Statut)
+   Poids par défaut: -3 à +4 selon choix
+
+4. 🚌 TRANSPORTS
+   Source: Nombre de stations bus/métro + V'Lille
+   Score: 0-100 (100 = très desservi)
+   Activation: Q1 (Budget serré), Q4 (Statut), Q5 (Transport)
+   Poids par défaut: +1 à +4
+
+5. 🌳 CALME
+   Source: Index de bruit + surface d'espaces verts
+   Score: 0-100 (100 = très calme et vert)
+   Activation: Q2 (Ambiance), Q3 (Lifestyle), Q4 (Statut)
+   Poids par défaut: -2 à +4
+
+6. 👨‍👩‍👧‍👦 FAMILLE
+   Source: Nombre d'écoles + parcs pour enfants
+   Score: 0-100 (100 = très adapté familles)
+   Activation: Q2 (Ambiance calme), Q4 (Parent)
+   Poids par défaut: 0 à +5
+
+7. 🏃 SPORT
+   Source: Nombre de complexes sportifs
+   Score: 0-100 (100 = bien équipé)
+   Activation: Q6 (Sportivité)
+   Poids par défaut: 0 à +4
+
+8. 🅿️ PARKING
+   Source: Nombre de places de parking
+   Score: 0-100 (100 = facile stationner)
+   Activation: Q5 (Voiture personnelle)
+   Poids par défaut: 0 à +3
+
+(+ 6 autres critères secondaires)
+
+
+═════════════════════════════════════════════════════════════════════════════════
+4. CALCUL DU SCORE FINAL
+═════════════════════════════════════════════════════════════════════════════════
+
+ÉTAPE 1: Construire le vecteur de poids
+─────────────────────────────────────────
+Pour chaque question, additionner les poids des critères correspondants.
+
+Exemple pour un utilisateur:
+  Q1: "Serré (< 600€)" → PRIX +30, Services +2, Transports +2
+  Q2: "Très calme"    → Calme +4, Vie animée -3, Services +1
+  Q3: "Cuisine"       → Calme +3, Services +2, Vie animée -1
+  Q4: "Parent"        → Famille +5, Calme +2, Services +2
+  Q5: "Transports"    → Transports +4, Services +1
+  Q6: "Peu sportif"   → Calme +2, Services +1
+
+Poids finaux par critère:
+  • PRIX:             30
+  • SERVICES:         2+1+2+2+1+1 = 9
+  • VIE ANIMÉE:       -3-1 = -4 (peut donner scores négatifs = pénalité)
+  • TRANSPORTS:       2+4 = 6
+  • CALME:            4+3+2+2 = 11
+  • FAMILLE:          5
+  • SPORT:            0
+  • PARKING:          0
+  • (autres)          ...
+
+
+ÉTAPE 2: Normaliser les scores du quartier
+────────────────────────────────────────────
+Chaque quartier IRIS a un score 0-100 pour chacun des 14 critères.
+Ces scores viennent de données réelles (Excel DATASET).
+
+Exemple pour "République":
+  • PRIX:             42/100 (quartier urbain = cher)
+  • SERVICES:         85/100 (beaucoup de commerces)
+  • VIE ANIMÉE:       78/100 (bars, restaurants)
+  • TRANSPORTS:       95/100 (métro, bus)
+  • CALME:            35/100 (bruit urbain)
+  • FAMILLE:          70/100 (écoles proches)
+  • SPORT:            80/100 (plusieurs complexes)
+  • PARKING:          40/100 (difficile stationner)
+
+
+ÉTAPE 3: Calculer la moyenne pondérée
+──────────────────────────────────────
+Score_République = (42×30 + 85×9 + 78×(-4) + 95×6 + 35×11 + 70×5 + 80×0 + 40×0) / (30+9+(-4)+6+11+5+0+0)
+
+Numérateur:
+  = 1260 + 765 - 312 + 570 + 385 + 350 + 0 + 0
+  = 3018
+
+Dénominateur (somme des poids):
+  = 30 + 9 - 4 + 6 + 11 + 5
+  = 57
+
+Score_République = 3018 / 57 = 52.95/100
+
+
+ÉTAPE 4: Classer tous les quartiers
+─────────────────────────────────────
+Répéter étape 3 pour les 110 quartiers IRIS.
+Afficher le TOP 10 sur la carte.
+
+
+═════════════════════════════════════════════════════════════════════════════════
+5. EXEMPLES CONCRETS DE SCORING
+═════════════════════════════════════════════════════════════════════════════════
+
+SCÉNARIO A: JEUNE CADRE URBAIN MOBILE
+──────────────────────────────────────
+
+Réponses:
+  Q1: Aucune limite (> 1300€/mois)
+  Q2: Très animé (vie nocturne, bars)
+  Q3: Je sors souvent au resto/bars
+  Q4: Actif professionnel
+  Q5: Transports publics
+  Q6: Peu sportif
+
+Poids résultants:
+  • PRIX:             0 (pas limité par budget)
+  • SERVICES:         2+1+2+1 = 6
+  • VIE ANIMÉE:       4+3+2 = 9 ⭐ MAXIMUM
+  • TRANSPORTS:       1+4 = 5
+  • CALME:            0 (même pénalisé: -2)
+  • FAMILLE:          0
+  • SPORT:            0
+  • PARKING:          0
+
+Quartiers favorisés: VIEUX LILLE, REPUBLIQUE (beaucoup de bars/restos)
+Quartiers défavorisés: WAZEMMES CALME, FIVES
+
+
+SCÉNARIO B: FAMILLE AVEC BUDGET LIMITÉ
+─────────────────────────────────────────
+
+Réponses:
+  Q1: Serré (< 600€/mois)
+  Q2: Calme avec services
+  Q3: Je cuisine, calme
+  Q4: Parent avec enfants
+  Q5: À pied / court trajet
+  Q6: Peu sportif
+
+Poids résultants:
+  • PRIX:             30 ⭐⭐⭐ ÉCRASANT
+  • SERVICES:         2+2+2+4 = 10
+  • VIE ANIMÉE:       0 (voire -1)
+  • TRANSPORTS:       2
+  • CALME:            2+3+2+2 = 9
+  • FAMILLE:          5 ⭐ TRÈS IMPORTANT
+  • SPORT:            0
+  • PARKING:          0
+
+Quartiers favorisés: WAZEMMES CALME, FIVES (bon marché, écoles, calme)
+Quartiers défavorisés: VIEUX LILLE, REPUBLIQUE (cher, bruyant)
+
+
+SCÉNARIO C: ÉTUDIANT SANS CONTRAINTE
+────────────────────────────────────────
+
+Réponses:
+  Q1: Modéré (600-900€/mois)
+  Q2: Dynamique et urbain
+  Q3: Équilibré
+  Q4: Étudiant
+  Q5: Vélo (V'Lille)
+  Q6: Très sportif
+
+Poids résultants:
+  • PRIX:             18 (modéré)
+  • SERVICES:         2+3+1 = 6
+  • VIE ANIMÉE:       2 (dynamique)
+  • TRANSPORTS:       1+3 = 4
+  • CALME:            0
+  • FAMILLE:          0
+  • SPORT:            4 ⭐ IMPORTANT
+  • PARKING:          0
+
+Quartiers favorisés: VIEUX LILLE, REPUBLIQUE (bars, transports, sport)
+Quartiers défavorisés: Zones trop éloignées ou sans services
+
+
+═════════════════════════════════════════════════════════════════════════════════
+6. CRITÈRES D'ÉVALUATION DES QUARTIERS
+═════════════════════════════════════════════════════════════════════════════════
+
+SOURCES DE DONNÉES:
+──────────────────────────────────────────────────────────────────────────────────
+
+1. Prix (Norm_Prix):
+   Source: Base de données immobilière - prix médian au m²
+   Plage: 2000€/m² - 4500€/m²
+   Normalisé: 0-100
+
+2. Pharmacies (Norm_Nb_Pharmacies):
+   Source: Annuaire des professionnels de santé
+   Plage: 0-25 par quartier
+   Normalisé: 0-100
+
+3. Commerces (Norm_Nb_Commerces):
+   Source: Données INSEE commerces et services
+   Plage: 10-200 par quartier
+   Normalisé: 0-100
+
+4. Bars (Norm_Nb_Bars):
+   Source: Données INSEE HoReCa
+   Plage: 0-50 par quartier
+   Normalisé: 0-100
+
+5. Restaurants (Norm_Nb_Restaurants):
+   Source: Données INSEE HoReCa
+   Plage: 0-80 par quartier
+   Normalisé: 0-100
+
+6. Transports (Norm_Nb_Transports):
+   Source: Plan des lignes TRANSPOLE + stations métro
+   Plage: 0-15 stations par quartier
+   Normalisé: 0-100
+
+7. V'Lille (Norm_Nb_VLille):
+   Source: Carte des stations V'Lille
+   Plage: 0-8 stations par quartier
+   Normalisé: 0-100
+
+8. Bruit (Norm_Bruit):
+   Source: Carte de bruit de la métropole lilloise
+   Plage: 50-80 dB
+   Normalisé: 0-100 (100 = très calme)
+
+9. Espaces verts (Norm_Surface_Verte_m2):
+   Source: OSM + données municipales
+   Plage: 1000-50000 m² par quartier
+   Normalisé: 0-100
+
+10. Écoles (Norm_Nb_Ecoles):
+    Source: Rectorat + données municipales
+    Plage: 0-15 par quartier
+    Normalisé: 0-100
+
+11. Parcs enfants (Norm_Nb_ParcsEnfants):
+    Source: Données municipales
+    Plage: 0-10 par quartier
+    Normalisé: 0-100
+
+12. Sport (Norm_Nb_ComplexesSportifs):
+    Source: Données municipales + privé
+    Plage: 0-8 par quartier
+    Normalisé: 0-100
+
+13. Parking (Norm_Nb_Parkings):
+    Source: Données municipales parking
+    Plage: 100-2000 places par quartier
+    Normalisé: 0-100
+
+14. (Critère 14):
+    [À compléter selon implémentation actuelle]
+
+
+NORMALISATION:
+──────────────────────────────────────────────────────────────────────────────────
+
+Formule: Critère_normalisé = (Valeur - Min) / (Max - Min) × 100
+
+Exemple pour Prix:
+  • Quartier le moins cher: 2000€/m² = 0/100
+  • Quartier le plus cher: 4500€/m² = 100/100
+  • Un quartier à 3000€/m² = (3000-2000)/(4500-2000) × 100 = 40/100
+
+
+═════════════════════════════════════════════════════════════════════════════════
+7. PARTICULARITÉS ET CAS SPÉCIAUX
+═════════════════════════════════════════════════════════════════════════════════
+
+⚠️ PÉNALITÉS (Poids négatifs):
+──────────────────────────────────────────────────────────────────────────────────
+Certaines réponses créent des pénalités (poids négatif):
+
+  • Cherche le CALME mais répond "Très animé" → Calme -2
+  • Cherche "très calme" mais répond "Vie nocturne" → Vie animée -3
+  • Cherche "vie nocturne" mais répond "Je cuisine calme" → Vie animée -1
+
+Logique: Un quartier n'aura pas un bon score s'il est bon dans les critères
+que l'utilisateur ne cherche pas.
+
+
+🔄 RÉINITIALISATION:
+──────────────────────────────────────────────────────────────────────────────────
+Bouton "Recommencer" (↻) réinitialise:
+  • current_index = 0 (revenir à Q1)
+  • liked = [] (réinitialiser les likes)
+  • disliked = [] (réinitialiser les dislikes)
+  • reponses = {} (vider les réponses)
+  • top_quartiers = None (effacer les résultats)
+  • selected_quartier = None (pas de quartier pré-sélectionné)
+
+
+📱 AFFICHAGE DES RÉSULTATS:
+──────────────────────────────────────────────────────────────────────────────────
+Après le quiz:
+  1. Carte interactive avec 110 quartiers IRIS colorés
+  2. Code couleur: rouge (score faible) → vert (score élevé)
+  3. Clic sur quartier → détails complets
+  4. Détails affichent:
+     - Score de compatibilité
+     - Comparaison attentes vs réalité (graphiques)
+     - Offres immobilières en location (carrousel)
+
+
+═════════════════════════════════════════════════════════════════════════════════
+                              FIN DE LA DOCUMENTATION
+═════════════════════════════════════════════════════════════════════════════════
