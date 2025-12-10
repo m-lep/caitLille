@@ -1615,6 +1615,36 @@ else:
                             unsafe_allow_html=True
                         )
         
+        # Afficher les offres pour ce quartier spécifique
+        st.markdown("---")
+        st.markdown(f"### 🏠 Offres disponibles à {nom_iris}")
+        
+        # Extraire le budget de la réponse Q1 si disponible
+        budget_min, budget_max = 200, None
+        if 0 in st.session_state.reponses:
+            budget_option = st.session_state.reponses[0].get('option', '')
+            budget_min, budget_max = get_budget_range_from_response(budget_option)
+        
+        # Scraper les annonces pour ce quartier spécifique
+        with st.spinner(f"Chargement des offres pour {nom_iris}..."):
+            annonces_quartier = scraper_immosens(secteur=nom_iris, budget_min=budget_min, budget_max=budget_max, max_annonces=10)
+        
+        if not annonces_quartier:
+            st.info(f"Aucune offre trouvée pour {nom_iris}. Essayez un autre quartier.")
+        else:
+            # Afficher le carrousel avec les offres du quartier
+            cards_html = ""
+            for annonce in annonces_quartier:
+                details = f"{annonce['pieces']}" if annonce['pieces'] != 'N/A' else ""
+                if details and annonce['surface'] != 'N/A':
+                    details += f" • {annonce['surface']}"
+                
+                card = f'<div class="listing-card"><img src="{annonce["image"]}" class="listing-image" alt="{annonce["type"]}"><div class="listing-content"><div class="listing-price">{annonce["prix"]}</div><div class="listing-type">{annonce["type"]}</div><div class="listing-location">{annonce["localisation"]} {details}</div><a href="{annonce["lien"]}" target="_blank" class="listing-link">Voir l\'offre</a></div></div>'
+                cards_html += card
+            
+            listings_html = f'<div class="carousel-container">{cards_html}</div>'
+            st.markdown(listings_html, unsafe_allow_html=True)
+        
     st.markdown("---")
 
     # Bouton Recommencer
