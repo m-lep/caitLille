@@ -1294,11 +1294,21 @@ else:
             if selected_feature:
                 props = selected_feature.get("properties", {})
                 code_iris = props.get("code_iris", "")
-                nom_iris_geo = props.get("nom_iris", "Zone")
+                # Récupérer le vrai nom IRIS depuis la matrice (pas depuis la GeoJSON)
+                nom_iris_real = "Zone"
+                if st.session_state.matrice_data is not None:
+                    try:
+                        code_iris_int = int(code_iris)
+                    except:
+                        code_iris_int = code_iris
+                    quartier_match = st.session_state.matrice_data[st.session_state.matrice_data['CODE_IRIS'] == code_iris_int]
+                    if not quartier_match.empty:
+                        nom_iris_real = quartier_match.iloc[0]['NOM_IRIS']
+                
                 # Mettre à jour le quartier sélectionné seulement si c'est un nouveau quartier
                 if st.session_state.selected_quartier != code_iris:
                     st.session_state.selected_quartier = code_iris
-                    st.session_state.selected_quartier_nom = nom_iris_geo  # Stocker aussi le nom générique
+                    st.session_state.selected_quartier_nom = nom_iris_real  # Stocker le vrai nom IRIS
                     st.rerun()
         except Exception:
             pass
