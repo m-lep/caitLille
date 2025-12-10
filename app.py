@@ -864,19 +864,30 @@ def enregistrer_reponse(option_texte):
     st.rerun()  # Force le rechargement immédiat
 
 
+def get_budget_range_from_response(budget_option):
+    """Extrait les limites de budget min/max en euros/mois depuis la réponse Q1"""
+    budget_mapping = {
+        'Serré (< 600€/mois)': (200, 600),
+        'Modéré (600-900€/mois)': (600, 900),
+        'Confortable (900-1300€/mois)': (900, 1300),
+        'Aucune limite (> 1300€/mois)': (1300, None),
+    }
+    return budget_mapping.get(budget_option, (200, None))
+
+
 @st.cache_data(ttl=3600)  # Cache pendant 1 heure
-def scraper_immosens(secteur="Vieux Lille", max_annonces=10):
-    """Scrape les annonces immobilières depuis Immosens"""
+def scraper_immosens(secteur="Lille", budget_min=200, budget_max=None, max_annonces=10):
+    """Scrape les annonces immobilières depuis Immosens pour locations"""
     BASE_URL = "https://www.immosens.fr"
     SEARCH_URL = "https://www.immosens.fr/produits.php"
     
     params = {
         'valid': 'ok',
-        'transac': 'L',
+        'transac': 'L',  # L = Location (rental)
         'type[]': '*',
         'ville': 'Lille',
-        'budget_min': '200',
-        'budget_max': '',
+        'budget_min': str(budget_min),
+        'budget_max': str(budget_max) if budget_max else '',
         'rayon': '0',
         'ref': '',
         'secteur': secteur,
@@ -1430,9 +1441,7 @@ else:
                     
                     # Afficher détails budget si c'est un critère important
                     if any(c['nom'] == '💰 Prix abordable' for c in criteres_importants):
-                        prix_median = quartier_row.iloc[0].get('Prix_Median_m2', None)
-                        if prix_median and prix_median > 0:
-                            st.info(f"💰 **Prix médian** : {prix_median:.0f}€/m² dans ce quartier")
+                        st.info(f"🏠 **Loyers dans ce quartier** : Consultez les offres disponibles ci-dessous pour voir les prix actuels de location")
                     
                     # Afficher le graphique de comparaison pour TOUS les critères importants
                     for critere in criteres_importants:
@@ -1492,9 +1501,15 @@ else:
         st.markdown("---")
         st.markdown(f"### 🏠 Offres disponibles")
         
-        # Scraper les annonces réelles
+        # Extraire le budget de la réponse Q1 si disponible
+        budget_min, budget_max = 200, None
+        if 0 in st.session_state.reponses:
+            budget_option = st.session_state.reponses[0].get('option', '')
+            budget_min, budget_max = get_budget_range_from_response(budget_option)
+        
+        # Scraper les annonces réelles avec le budget de l'utilisateur
         with st.spinner("Chargement des offres..."):
-            annonces = scraper_immosens(secteur=nom_iris, max_annonces=10)
+            annonces = scraper_immosens(secteur=nom_iris, budget_min=budget_min, budget_max=budget_max, max_annonces=10)
         
         if not annonces:
             st.info(f"Aucune offre trouvée pour {nom_iris}. Essayez un autre quartier.")

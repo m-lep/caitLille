@@ -33,22 +33,22 @@ CATEGORIES_CRITERES = {
 LOGIQUE_QUESTIONS = {
     # Q1: Budget (ABSOLUMENT PRIORITAIRE)
     'budget': {
-        'Serré (< 2000€/m²)': {
+        'Serré (< 600€/mois)': {
             'PRIX': 30,  # POIDS MASSIF pour le budget serré - PRIORITÉ ABSOLUE
             'SERVICES_PROXIMITE': 2,  # Un peu de services pratiques
             'TRANSPORTS': 2,  # Besoin de transports accessibles
         },
-        'Modéré (2000-3000€/m²)': {
+        'Modéré (600-900€/mois)': {
             'PRIX': 18,  # Important mais moins strict
             'SERVICES_PROXIMITE': 2,
             'VIE_ANIMEE': 1,
         },
-        'Confortable (3000-4000€/m²)': {
+        'Confortable (900-1300€/mois)': {
             'PRIX': 10,  # Encore considéré
             'VIE_ANIMEE': 2,
             'SERVICES_PROXIMITE': 2,
         },
-        'Aucune limite (> 4000€/m²)': {
+        'Aucune limite (> 1300€/mois)': {
             'VIE_ANIMEE': 3,
             'SERVICES_PROXIMITE': 2,
             'CALME': 1,

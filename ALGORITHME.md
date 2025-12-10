@@ -23,10 +23,10 @@ Chaque réponse ajuste l'**importance** (poids) des critères. Voici **exactemen
 
 | Réponse | Impact sur les poids |
 |---------|---------------------|
-| **Serré (< 2000€/m²)** | Prix: **+30** (ultra prioritaire !), Services proximité: +2, Transports: +2 |
-| **Modéré (2000-3000€/m²)** | Prix: **+18**, Services proximité: +2, Vie animée: +1 |
-| **Confortable (3000-4000€/m²)** | Prix: **+10**, Vie animée: +2, Services proximité: +2 |
-| **Aucune limite (> 4000€/m²)** | Vie animée: +3, Services proximité: +2, Calme: +1 |
+| **Serré (< 600€/mois)** | Prix: **+30** (ultra prioritaire !), Services proximité: +2, Transports: +2 |
+| **Modéré (600-900€/mois)** | Prix: **+18**, Services proximité: +2, Vie animée: +1 |
+| **Confortable (900-1300€/mois)** | Prix: **+10**, Vie animée: +2, Services proximité: +2 |
+| **Aucune limite (> 1300€/mois)** | Vie animée: +3, Services proximité: +2, Calme: +1 |
 
 #### 🌆 **Q2 : Ambiance**
 

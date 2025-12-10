@@ -4,14 +4,14 @@ NOUVELLES_QUESTIONS = [
         "emoji": "💰",
         "vibe": "Quel est ton budget ?",
         "tags": ["prix", "budget", "loyer"],
-        "description": "Quel est ton budget maximum pour te loger ? (prix au m²)",
+        "description": "Quel est ton budget mensuel maximum de loyer ?",
         "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "budget",
         "options": [
-            {"text": "🪙 Serré (< 2000€/m²)", "value": "Serré (< 2000€/m²)"},
-            {"text": "💵 Modéré (2000-3000€/m²)", "value": "Modéré (2000-3000€/m²)"}, 
-            {"text": "💰 Confortable (3000-4000€/m²)", "value": "Confortable (3000-4000€/m²)"},
-            {"text": "💎 Aucune limite (> 4000€/m²)", "value": "Aucune limite (> 4000€/m²)"}
+            {"text": "🪙 Serré (< 600€/mois)", "value": "Serré (< 600€/mois)"},
+            {"text": "💵 Modéré (600-900€/mois)", "value": "Modéré (600-900€/mois)"}, 
+            {"text": "💰 Confortable (900-1300€/mois)", "value": "Confortable (900-1300€/mois)"},
+            {"text": "💎 Aucune limite (> 1300€/mois)", "value": "Aucune limite (> 1300€/mois)"}
         ]
     },
     {

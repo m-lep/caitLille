@@ -293,7 +293,7 @@ def creer_carte(df_scores, geojson_path, matrice):
 
 # Exemple 1: Budget serré, calme, parent
 reponses_test = {
-    0: {'question_id': 'budget', 'option': 'Serré (< 2500€/m²)'},
+    0: {'question_id': 'budget', 'option': 'Serré (< 600€/mois)'},
     1: {'question_id': 'ambiance', 'option': 'Calme avec espaces verts'},
     2: {'question_id': 'activite', 'option': 'Occasionnellement sportif'},
     3: {'question_id': 'statut', 'option': 'Parent avec enfants'},
@@ -338,7 +338,7 @@ print("="*80)
 print("""
 # Exemple 2: Étudiant budget serré, vie animée
 reponses_etudiant = {
-    0: {'question_id': 'budget', 'option': 'Serré (< 2500€/m²)'},
+    0: {'question_id': 'budget', 'option': 'Serré (< 600€/mois)'},
     1: {'question_id': 'ambiance', 'option': 'Très animé (vie nocturne, bars)'},
     2: {'question_id': 'activite', 'option': 'Peu sportif'},
     3: {'question_id': 'statut', 'option': 'Étudiant'},
@@ -348,7 +348,7 @@ reponses_etudiant = {
 
 # Exemple 3: Senior aisé, calme absolu
 reponses_senior = {
-    0: {'question_id': 'budget', 'option': 'Aucune limite (> 4000€/m²)'},
+    0: {'question_id': 'budget', 'option': 'Aucune limite (> 1300€/mois)'},
     1: {'question_id': 'ambiance', 'option': 'Calme avec espaces verts'},
     2: {'question_id': 'activite', 'option': 'Occasionnellement sportif'},
     3: {'question_id': 'statut', 'option': 'Senior'},
