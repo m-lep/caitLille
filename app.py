@@ -1079,7 +1079,7 @@ else:
 
     # Créer la carte Folium centrée sur la Place de la République - Style Apple Maps
     m = folium.Map(
-        location=[50.6000, 3.2500],  # Place de la République, Lille
+        location=[50.6000, 3.2700],  # Place de la République, Lille
         zoom_start=13,
         tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
         attr='© OpenStreetMap contributors © CARTO',
