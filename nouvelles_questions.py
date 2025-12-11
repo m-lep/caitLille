@@ -20,7 +20,7 @@ NOUVELLES_QUESTIONS = [
         "vibe": "Quelle ambiance ?",
         "tags": ["ambiance", "environnement", "calme"],
         "description": "Quelle ambiance de quartier te correspond ?",
-        "image": "https://files.slack.com/files-pri/T02NE0241-F0A2MEA1LMA/image.png?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://i.imgur.com/vqU8GXb.jpeg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "ambiance",
         "options": [
             {"text": "🌳 Très calme, nature et verdure", "value": "Très calme, nature et verdure"},
@@ -35,7 +35,7 @@ NOUVELLES_QUESTIONS = [
         "vibe": "Ton quotidien ?",
         "tags": ["lifestyle", "sorties", "cuisine"],
         "description": "Comment vis-tu au quotidien ?",
-        "image": "https://files.slack.com/files-pri/T02NE0241-F0A2EDQ0DKP/image.png?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://medias.student-factory.com/_medias-student-prod_/a6b5ded0-aa1a-4aea-9e33-b82d91554e69/Ou-sortir-a-Lille-1.jpeg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "mode_vie",
         "options": [
             {"text": "🍳 Je cuisine, j'aime le calme", "value": "Je cuisine, j'aime le calme"},
@@ -50,7 +50,7 @@ NOUVELLES_QUESTIONS = [
         "vibe": "Ton profil ?",
         "tags": ["statut", "profil", "situation"],
         "description": "Quelle est ta situation actuelle ?",
-        "image": "https://woody.cloudly.space/app/uploads/lille-tourisme/2025/06/thumbs/Parc-Mosaic-Famille-1920x960.webp?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://medias.student-factory.com/_medias-student-prod_/d90f855e-cfc6-4be0-b41a-f67d561bfdab/weekend-Lille-Student-Factory.jpeg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "statut",
         "options": [
             {"text": "👶 Parent (avec enfants)", "value": "Parent (avec enfants)"},
@@ -65,7 +65,7 @@ NOUVELLES_QUESTIONS = [
         "vibe": "Comment te déplaces-tu ?",
         "tags": ["transport", "mobilité"],
         "description": "Quel est ton mode de déplacement principal ?",
-        "image": "https://files.slack.com/files-pri/T02NE0241-F0A2EEG0FCM/image.png?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://zangolille.fr/wp-content/uploads/2024/05/IMG_5521-1024x683.jpg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "transport",
         "options": [
             {"text": "🚇 Transports en commun uniquement", "value": "Transports en commun uniquement"},
@@ -80,7 +80,7 @@ NOUVELLES_QUESTIONS = [
         "vibe": "Sportif ?",
         "tags": ["sport", "activité", "loisirs"],
         "description": "Fais-tu du sport régulièrement ?",
-        "image": "https://files.slack.com/files-pri/T02NE0241-F0A22EG3K0F/image.png?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://medias.student-factory.com/_medias-student-prod_/76cf762e-787a-4131-8ec0-3ff837643127/Piscine-Lille.jpg?auto=format&fit=crop&w=1200&q=80",
         "question_id": "activite",
         "options": [
             {"text": "🏋️ Très sportif (besoin d'équipements)", "value": "Très sportif (besoin d'équipements)"},
