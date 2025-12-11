@@ -20,7 +20,7 @@ NOUVELLES_QUESTIONS = [
         "vibe": "Quelle ambiance ?",
         "tags": ["ambiance", "environnement", "calme"],
         "description": "Quelle ambiance de quartier te correspond ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://files.slack.com/files-pri/T02NE0241-F0A2MEA1LMA/image.png?auto=format&fit=crop&w=1200&q=80",
         "question_id": "ambiance",
         "options": [
             {"text": "🌳 Très calme, nature et verdure", "value": "Très calme, nature et verdure"},
@@ -35,7 +35,7 @@ NOUVELLES_QUESTIONS = [
         "vibe": "Ton quotidien ?",
         "tags": ["lifestyle", "sorties", "cuisine"],
         "description": "Comment vis-tu au quotidien ?",
-        "image": "https://uploads.lebonbon.fr/source/2023/march/2043048/ville-lille_1_2000.jpg?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://files.slack.com/files-pri/T02NE0241-F0A2EDQ0DKP/image.png?auto=format&fit=crop&w=1200&q=80",
         "question_id": "mode_vie",
         "options": [
             {"text": "🍳 Je cuisine, j'aime le calme", "value": "Je cuisine, j'aime le calme"},
@@ -50,7 +50,7 @@ NOUVELLES_QUESTIONS = [
         "vibe": "Ton profil ?",
         "tags": ["statut", "profil", "situation"],
         "description": "Quelle est ta situation actuelle ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://woody.cloudly.space/app/uploads/lille-tourisme/2025/06/thumbs/Parc-Mosaic-Famille-1920x960.webp?auto=format&fit=crop&w=1200&q=80",
         "question_id": "statut",
         "options": [
             {"text": "👶 Parent (avec enfants)", "value": "Parent (avec enfants)"},
@@ -65,7 +65,7 @@ NOUVELLES_QUESTIONS = [
         "vibe": "Comment te déplaces-tu ?",
         "tags": ["transport", "mobilité"],
         "description": "Quel est ton mode de déplacement principal ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://files.slack.com/files-pri/T02NE0241-F0A2EEG0FCM/image.png?auto=format&fit=crop&w=1200&q=80",
         "question_id": "transport",
         "options": [
             {"text": "🚇 Transports en commun uniquement", "value": "Transports en commun uniquement"},
@@ -80,7 +80,7 @@ NOUVELLES_QUESTIONS = [
         "vibe": "Sportif ?",
         "tags": ["sport", "activité", "loisirs"],
         "description": "Fais-tu du sport régulièrement ?",
-        "image": "https://asset-prod.france.fr/en_tete_article_Mathieu_Lassalle_Hello_Lille_d989f67e94.jpg?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://files.slack.com/files-pri/T02NE0241-F0A22EG3K0F/image.png?auto=format&fit=crop&w=1200&q=80",
         "question_id": "activite",
         "options": [
             {"text": "🏋️ Très sportif (besoin d'équipements)", "value": "Très sportif (besoin d'équipements)"},
